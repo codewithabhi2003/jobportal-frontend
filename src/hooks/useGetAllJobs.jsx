@@ -1,0 +1,30 @@
+import { setAllJobs } from '@/redux/jobSlice';
+import axiosInstance from '@/utils/axiosInstance';
+import { JOB_API_END_POINT } from '@/utils/constant';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+const useGetAllJobs = () => {
+  const dispatch = useDispatch();
+  const { searchedQuery } = useSelector(store => store.job);
+
+  useEffect(() => {
+    const fetchAllJobs = async () => {
+      try {
+        const res = await axiosInstance.get(
+          `${JOB_API_END_POINT}/get?keyword=${searchedQuery}`
+        );
+
+        if (res.data.success) {
+          dispatch(setAllJobs(res.data.jobs));
+        }
+      } catch (error) {
+        console.log("Failed to fetch jobs", error);
+      }
+    };
+
+    fetchAllJobs();
+  }, [searchedQuery, dispatch]);
+};
+
+export default useGetAllJobs;
