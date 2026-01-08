@@ -1,29 +1,35 @@
+// src/components/About.jsx
 import React from "react";
-import { Briefcase, Users, Rocket } from "lucide-react";
+import {
+  Briefcase,
+  Users,
+  Rocket,
+  Search,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-    },
+    transition: { staggerChildren: 0.18 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.45, ease: "easeOut" },
   },
 };
 
 const About = () => {
   return (
-    <section className="bg-white py-12 sm:py-16">
+    <section id="about" className="bg-white py-10 sm:py-14">
       <motion.div
         className="max-w-7xl mx-auto px-4 sm:px-6"
         variants={containerVariants}
@@ -40,86 +46,110 @@ const About = () => {
             About <span className="text-[#6A38C2]">JobPortal</span>
           </h2>
           <p className="mt-4 text-gray-600 text-sm sm:text-base">
-            JobPortal is a modern job-hunting platform designed to connect
-            talented professionals with trusted companies. We make job searching
-            simple, fast, and effective.
+            JobPortal is a modern job-hunting platform designed to connect talented
+            professionals with trusted companies through a simple and reliable
+            experience.
           </p>
         </motion.div>
 
         {/* Features */}
         <motion.div
           variants={containerVariants}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 sm:mt-10"
         >
-          {/* Feature 1 */}
+          {/* Card 1 */}
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -6 }}
-            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition bg-white"
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:ring-1 hover:ring-purple-200 transition bg-white"
           >
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
               <Briefcase />
             </div>
-            <h3 className="font-semibold text-lg text-gray-900">
-              Find the Right Job
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Browse thousands of job listings tailored to your skills,
-              experience, and career goals.
+            <h3 className="font-semibold text-lg">Find the Right Job</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Browse curated job listings tailored to your skills, interests,
+              experience level, and long-term career goals.
             </p>
           </motion.div>
 
-          {/* Feature 2 */}
+          {/* Card 2 */}
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -6 }}
-            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition bg-white"
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:ring-1 hover:ring-purple-200 transition bg-white"
           >
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
               <Users />
             </div>
-            <h3 className="font-semibold text-lg text-gray-900">
-              Trusted Companies
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Connect with verified recruiters and companies looking for genuine
-              talent.
+            <h3 className="font-semibold text-lg">Trusted Companies</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Connect with verified recruiters and trusted companies actively
+              looking for skilled and motivated professionals.
             </p>
           </motion.div>
 
-          {/* Feature 3 */}
+          {/* Card 3 */}
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -6 }}
-            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition bg-white"
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:ring-1 hover:ring-purple-200 transition bg-white"
           >
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
               <Rocket />
             </div>
-            <h3 className="font-semibold text-lg text-gray-900">
-              Grow Your Career
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Apply easily, track applications, and take the next step toward
-              your dream career.
+            <h3 className="font-semibold text-lg">Grow Your Career</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Apply seamlessly, prepare confidently, and take meaningful steps
+              toward professional growth and long-term success.
             </p>
           </motion.div>
 
-          {/* Feature 4 */}
+          {/* Card 4 */}
           <motion.div
             variants={itemVariants}
             whileHover={{ y: -6 }}
-            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition bg-white"
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:ring-1 hover:ring-purple-200 transition bg-white"
           >
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
-              <Users />
+              <TrendingUp />
             </div>
-            <h3 className="font-semibold text-lg text-gray-900">
-              Track Applications Easily
-            </h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Stay updated on all your job applications with real-time status
-              tracking, so you always know where you stand.
+            <h3 className="font-semibold text-lg">Track Applications</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Monitor all your job applications in real time with clear status
+              updates and organized tracking.
+            </p>
+          </motion.div>
+
+          {/* Card 5 */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ y: -6 }}
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:ring-1 hover:ring-purple-200 transition bg-white"
+          >
+            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
+              <Search />
+            </div>
+            <h3 className="font-semibold text-lg">Smart Job Search</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Quickly filter and search jobs by role, location, experience,
+              and preferences for faster results.
+            </p>
+          </motion.div>
+
+          {/* Card 6 */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ y: -6 }}
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-lg hover:ring-1 hover:ring-purple-200 transition bg-white"
+          >
+            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
+              <ShieldCheck />
+            </div>
+            <h3 className="font-semibold text-lg">Secure & Reliable</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Your personal data is protected using secure authentication,
+              reliable infrastructure, and best security practices.
             </p>
           </motion.div>
         </motion.div>

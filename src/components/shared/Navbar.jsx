@@ -1,140 +1,164 @@
-import React from "react";
+import React, { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
-import { LogOut, User2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { LogOut, User2, Menu, X } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 
-function Navbar() {
+const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openMenu, setOpenMenu] = useState(false);
 
   const logoutHandler = async () => {
     try {
-      const res = await axios.get(`${USER_API_END_POINT}/logout`, { withCredentials: true });
+      const res = await axios.get(`${USER_API_END_POINT}/logout`, {
+        withCredentials: true,
+      });
       if (res.data.success) {
         dispatch(setUser(null));
         navigate("/");
         toast.success(res.data.message);
+        setOpenMenu(false);
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
+    } catch {
+      toast.error("Logout failed");
     }
   };
 
+  const handleAboutClick = () => {
+    if (location.pathname === "/") {
+      document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/", { state: { scrollTo: "about" } });
+    }
+    setOpenMenu(false);
+  };
+
   return (
-    <div className="bg-white shadow-md">
-      <div className="flex items-center justify-between mx-auto max-w-7xl h-16 px-4 sm:px-6">
-        {/* Logo Section */}
-        <h1 className="text-xl sm:text-2xl font-bold tracking-wide text-gray-800">
+    <header className="w-full bg-white shadow-md relative z-50">
+      <div className="max-w-7xl mx-auto h-16 px-4 sm:px-6 flex items-center justify-between">
+
+        {/* LEFT - MENU */}
+        <button className="md:hidden" onClick={() => setOpenMenu(true)}>
+          <Menu size={26} />
+        </button>
+
+        {/* LOGO */}
+        <h1 className="text-2xl font-bold tracking-wide text-gray-800">
           Job<span className="text-[#F83002]">Portal</span>
         </h1>
 
-        {/* Navigation Links & Profile Section */}
-        <div className="flex items-center gap-4 sm:gap-10">
-          <ul className={`${user ? "flex" : "hidden"} font-medium items-center gap-3 sm:gap-6 text-gray-700`}>
+        {/* RIGHT */}
+        <div className="flex items-center gap-3">
 
+          {/* ===== DESKTOP ===== */}
+          <div className="hidden md:flex items-center gap-10">
+            <ul className="flex gap-6 font-medium text-gray-700">
+              {user?.role === "Recruiter" ? (
+                <>
+                  <li><Link to="/admin/companies">Companies</Link></li>
+                  <li><Link to="/admin/jobs">Jobs</Link></li>
+                </>
+              ) : (
+                <>
+                  <li><Link to="/">Home</Link></li>
+                  <li><Link to="/jobs">Jobs</Link></li>
+                  <li><Link to="/browse">Browse</Link></li>
+                  <li onClick={handleAboutClick} className="cursor-pointer">About</li>
+                </>
+              )}
+            </ul>
 
-            {user && user.role === "Recruiter" ? (
-              <>
-                <li className="hover:text-[#F83002] transition">
-                  <Link to="/admin/companies">Companies</Link>
-                </li>
-                <li className="hover:text-[#F83002] transition">
-                  <Link to="/admin/jobs">Jobs</Link>
-                </li>
-              </>
+            {!user ? (
+              <div className="flex gap-3">
+                <Link to="/login"><Button variant="outline">Login</Button></Link>
+                <Link to="/signup">
+                  <Button className="bg-[#6A38C2] text-white">Signup</Button>
+                </Link>
+              </div>
             ) : (
-              <>
-                <li className="hover:text-[#F83002] transition">
-                  <Link to="/">Home</Link>
-                </li>
-                <li className="hover:text-[#F83002] transition">
-                  <Link to="/jobs">Jobs</Link>
-                </li>
-                <li className="hover:text-[#F83002] transition">
-                  <Link to="/browse">Browse</Link>
-                </li>
-              </>
-            )}
-          </ul>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user?.profile?.profilePhoto} />
+                  </Avatar>
+                </PopoverTrigger>
 
+                <PopoverContent className="w-56 bg-white border shadow-lg rounded-lg">
+                  <Link to="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
+                    <User2 size={18} /> View Profile
+                  </Link>
+                  <button
+                    onClick={logoutHandler}
+                    className="flex items-center gap-2 px-4 py-2 w-full text-left text-red-600 hover:bg-gray-100"
+                  >
+                    <LogOut size={18} /> Logout
+                  </button>
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
+
+          {/* ===== MOBILE RIGHT AUTH ===== */}
           {!user ? (
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link to="/Login">
-                <Button
-                  variant="outline"
-                  className="px-3 sm:px-5 py-1.5 sm:py-2 border-gray-300 text-gray-700 hover:border-gray-400"
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link to="/Singup">
-                <Button className="bg-[#6A38C2] hover:bg-[#5b30a6] px-3 sm:px-5 py-1.5 sm:py-2 text-white rounded-lg shadow-md transition">
-                  Signup
-                </Button>
+            <div className="md:hidden flex gap-2">
+              <Link to="/login"><Button size="sm" variant="outline">Login</Button></Link>
+              <Link to="/signup">
+                <Button size="sm" className="bg-[#6A38C2] text-white">Signup</Button>
               </Link>
             </div>
           ) : (
             <Popover>
               <PopoverTrigger asChild>
-                <Avatar className="cursor-pointer hover:ring-2 hover:ring-gray-300 transition w-9 h-9 sm:w-10 sm:h-10">
-                  <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
+                <Avatar className="md:hidden cursor-pointer">
+                  <AvatarImage src={user?.profile?.profilePhoto} />
                 </Avatar>
               </PopoverTrigger>
 
-              <PopoverContent className="w-64 sm:w-72 p-4 bg-white shadow-lg rounded-lg">
-                <div>
-                  <div className="flex items-center gap-3 border-b pb-3">
-                    <Avatar className="cursor-pointer w-10 h-10 sm:w-12 sm:h-12">
-                      <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
-                    </Avatar>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
-                        {user?.fullname}
-                      </h4>
-                      <p className="text-xs sm:text-sm text-gray-500">
-                        {user?.profile?.bio}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col mt-3 space-y-2 text-gray-600">
-                    {user && user.role === "job-seeker" && (
-                      <div className="flex items-center gap-2 cursor-pointer hover:text-[#6A38C2] transition">
-                        <User2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <Button variant="link" className="p-0">
-                          <Link to="/Profile">View Profile</Link>
-                        </Button>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 cursor-pointer hover:text-[#F83002] transition">
-                      <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <Button
-                        onClick={logoutHandler}
-                        variant="link"
-                        className="p-0 text-gray-700 hover:text-red-600"
-                      >
-                        Logout
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+              <PopoverContent className="w-44 bg-white border shadow-lg rounded-lg">
+                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">
+                  View Profile
+                </Link>
+                <button
+                  onClick={logoutHandler}
+                  className="block px-4 py-2 text-red-600 w-full text-left hover:bg-gray-100"
+                >
+                  Logout
+                </button>
               </PopoverContent>
             </Popover>
           )}
         </div>
       </div>
-    </div>
+
+      {/* ===== MOBILE MENU (NOT FULL HEIGHT) ===== */}
+      {openMenu && (
+        <div className="absolute top-16 left-0 w-72 bg-white shadow-xl border rounded-br-xl">
+          <div className="flex justify-between items-center p-4 border-b">
+            <h2 className="font-semibold">Menu</h2>
+            <button onClick={() => setOpenMenu(false)}>
+              <X size={22} />
+            </button>
+          </div>
+
+          <nav className="flex flex-col divide-y">
+            <Link onClick={() => setOpenMenu(false)} to="/" className="px-4 py-3">Home</Link>
+            <Link onClick={() => setOpenMenu(false)} to="/jobs" className="px-4 py-3">Jobs</Link>
+            <Link onClick={() => setOpenMenu(false)} to="/browse" className="px-4 py-3">Browse</Link>
+            <button onClick={handleAboutClick} className="px-4 py-3 text-left">About</button>
+          </nav>
+        </div>
+      )}
+    </header>
   );
-}
+};
 
 export default Navbar;
