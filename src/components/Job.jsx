@@ -30,28 +30,31 @@ const Job = ({ job }) => {
      🔖 SAVE / UNSAVE (BACKEND)
   =============================== */
   const saveHandler = async () => {
-    if (!user) {
-      toast.error("Login required to save jobs");
-      return;
-    }
+  if (!user) {
+    toast.error("Login required to save jobs");
+    return;
+  }
 
-    try {
-      const res = await axios.post(
-        `${BOOKMARK_API_END_POINT}/${job._id}`,
-        {},
-        { withCredentials: true }
-      );
+  // 🔥 OPTIMISTIC UI UPDATE (instant)
+  const updatedJobs = isSaved
+    ? savedJobs.filter(j => j._id !== job._id)
+    : [...savedJobs, job];
 
-      if (res.data.success) {
-        dispatch(setSavedJobs(res.data.savedJobs));
-        toast.success(
-          isSaved ? "Removed from saved jobs" : "Job saved successfully"
-        );
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Bookmark failed");
-    }
-  };
+  dispatch(setSavedJobs(updatedJobs));
+
+  try {
+    await axios.post(
+      `${BOOKMARK_API_END_POINT}/${job._id}`,
+      {},
+      { withCredentials: true }
+    );
+  } catch (error) {
+    // ❌ rollback if API fails
+    dispatch(setSavedJobs(savedJobs));
+    toast.error("Bookmark failed");
+  }
+};
+
 
   return (
     <div className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 transition hover:shadow-xl">
