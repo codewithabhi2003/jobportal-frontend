@@ -4,94 +4,142 @@ import { Bookmark } from 'lucide-react';
 import { Avatar, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { setSavedJobs } from '@/redux/jobSlice';
+import { toast } from 'sonner';
+import { BOOKMARK_API_END_POINT } from '@/utils/constant';
 
 const Job = ({ job }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const daysagoFunction = (mongodbTime) => {
-        const createdAt = new Date(mongodbTime);
-        const currentTime = new Date();
-        const timeDifference = currentTime - createdAt;
-        return Math.floor(timeDifference / (1000 * 24 * 60 * 60));
-    };
+  const { user } = useSelector(store => store.auth);
+  const { savedJobs = [] } = useSelector(store => store.job);
 
-    return (
-        <div className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 transition hover:shadow-xl">
-            
-            {/* Top Section */}
-            <div className="flex items-center justify-between">
-                <p className="text-xs sm:text-sm text-gray-500">
-                    {daysagoFunction(job?.createdAt) == 0
-                        ? "Today"
-                        : `${daysagoFunction(job?.createdAt)} days ago`}
-                </p>
+  const isSaved = savedJobs.some(j => j._id === job?._id);
 
-                <Button
-                    className="rounded-full bg-transparent hover:bg-gray-100 active:bg-gray-300 transition duration-150"
-                    size="icon"
-                >
-                    <Bookmark className="text-gray-600 h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
-            </div>
+  const daysagoFunction = (mongodbTime) => {
+    const createdAt = new Date(mongodbTime);
+    const currentTime = new Date();
+    const timeDifference = currentTime - createdAt;
+    return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  };
 
-            {/* Company Info */}
-            <div className="flex items-center gap-3 sm:gap-4 my-3 sm:my-4">
-                <Avatar className="w-12 h-12 sm:w-14 sm:h-14 border border-gray-200 shadow-sm">
-                    <AvatarImage src={job?.company?.logo} />
-                </Avatar>
+  /* ===============================
+     🔖 SAVE / UNSAVE (BACKEND)
+  =============================== */
+  const saveHandler = async () => {
+    if (!user) {
+      toast.error("Login required to save jobs");
+      return;
+    }
 
-                <div>
-                    <h1 className="font-semibold text-base sm:text-lg text-gray-900">
-                        {job?.company?.name}
-                    </h1>
-                    <p className="text-xs sm:text-sm text-gray-500">
-                        India
-                    </p>
-                </div>
-            </div>
+    try {
+      const res = await axios.post(
+        `${BOOKMARK_API_END_POINT}/${job._id}`,
+        {},
+        { withCredentials: true }
+      );
 
-            {/* Job Title & Description */}
-            <div className="my-3 sm:my-4">
-                <h1 className="font-bold text-lg sm:text-xl text-gray-900">
-                    {job?.title}
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-3">
-                    {job?.discription}
-                </p>
-            </div>
+      if (res.data.success) {
+        dispatch(setSavedJobs(res.data.savedJobs));
+        toast.success(
+          isSaved ? "Removed from saved jobs" : "Job saved successfully"
+        );
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Bookmark failed");
+    }
+  };
 
-            {/* Badges */}
-            <div className="flex flex-wrap items-center gap-2 mt-3 sm:mt-4">
-                <Badge className="bg-gray-100 text-blue-700 font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-xs sm:text-sm">
-                    {job?.position} position
-                </Badge>
+  return (
+    <div className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 transition hover:shadow-xl">
 
-                <Badge className="bg-gray-100 text-[#F83002] font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-xs sm:text-sm">
-                    {job.jobType}
-                </Badge>
+      {/* Top Section */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs sm:text-sm text-gray-500">
+          {daysagoFunction(job?.createdAt) === 0
+            ? "Today"
+            : `${daysagoFunction(job?.createdAt)} days ago`}
+        </p>
 
-                <Badge className="bg-gray-100 text-[#7209b7] font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-xs sm:text-sm">
-                    {job?.salary} LPA
-                </Badge>
-            </div>
+        {/* 🔖 Bookmark Icon */}
+        <Button
+          onClick={saveHandler}
+          className="rounded-full bg-transparent hover:bg-gray-100"
+          size="icon"
+        >
+          <Bookmark
+            className={`h-4 w-4 sm:h-5 sm:w-5 ${
+              isSaved ? "text-purple-600" : "text-gray-600"
+            }`}
+            fill={isSaved ? "currentColor" : "none"}
+          />
+        </Button>
+      </div>
 
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
-                <Button
-                    onClick={() => navigate(`/description/${job?._id}`)}
-                    className="border border-gray-400 text-gray-700 bg-white hover:bg-gray-100 active:bg-gray-300 px-4 sm:px-5 py-2 rounded-lg transition text-sm"
-                >
-                    Details
-                </Button>
+      {/* Company Info */}
+      <div className="flex items-center gap-3 sm:gap-4 my-3 sm:my-4">
+        <Avatar className="w-12 h-12 sm:w-14 sm:h-14 border border-gray-200 shadow-sm">
+          <AvatarImage src={job?.company?.logo} />
+        </Avatar>
 
-                <Button
-                    className="bg-[#7209b7] text-white hover:bg-[#5e0894] active:bg-[#56088a] px-4 sm:px-5 py-2 rounded-lg transition text-sm"
-                >
-                    Save For Later
-                </Button>
-            </div>
+        <div>
+          <h1 className="font-semibold text-base sm:text-lg text-gray-900">
+            {job?.company?.name}
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500">
+            India
+          </p>
         </div>
-    );
+      </div>
+
+      {/* Job Title & Description */}
+      <div className="my-3 sm:my-4">
+        <h1 className="font-bold text-lg sm:text-xl text-gray-900">
+          {job?.title}
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-3">
+          {job?.description}
+        </p>
+      </div>
+
+      {/* Badges */}
+      <div className="flex flex-wrap items-center gap-2 mt-3 sm:mt-4">
+        <Badge className="bg-gray-100 text-blue-700 font-semibold">
+          {job?.position} position
+        </Badge>
+        <Badge className="bg-gray-100 text-[#F83002] font-semibold">
+          {job?.jobType}
+        </Badge>
+        <Badge className="bg-gray-100 text-[#7209b7] font-semibold">
+          {job?.salary} LPA
+        </Badge>
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6">
+        <Button
+          onClick={() => navigate(`/description/${job?._id}`)}
+          className="border border-gray-400 text-gray-700 bg-white hover:bg-gray-100"
+        >
+          Details
+        </Button>
+
+        <Button
+          onClick={saveHandler}
+          className={`${
+            isSaved
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-[#7209b7] hover:bg-[#5e0894]"
+          } text-white`}
+        >
+          {isSaved ? "Saved" : "Save For Later"}
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 export default Job;

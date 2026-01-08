@@ -4,7 +4,7 @@ import Singup from './components/auth/Singup'
 import Login from './components/auth/Login'
 import Home from './components/Home'
 import Jobs from './components/Jobs'
-import Browse from './components/Browse'
+import Bookmark from './components/Bookmark'
 import Profile from './components/Profile'
 import JobDescription from './components/JobDescription'
 import Companies from './components/admin/Companies'
@@ -15,6 +15,7 @@ import PostJob from './components/admin/PostJob'
 import Applicants from './components/admin/Applicants'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import UpdateJob from './components/admin/UpdateJob'
+import Browse from './components/Browse'
 
 
 
@@ -45,6 +46,10 @@ const appRouter = createBrowserRouter([
   {
     path:"/Browse",
     element:<Browse/>
+  },
+  {
+    path:"/bookmark",
+    element:<Bookmark/>
   },
   {
     path:"/Profile",

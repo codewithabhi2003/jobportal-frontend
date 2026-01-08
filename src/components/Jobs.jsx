@@ -1,18 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from './shared/Navbar';
-import FilterCard from './FilterCard';
-import Job from './Job';
-import { useSelector } from 'react-redux';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import Navbar from "./shared/Navbar";
+import FilterCard from "./FilterCard";
+import Job from "./Job";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+
+/* 🔹 Motion Variants (same as Bookmark) */
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+};
 
 const Jobs = () => {
-  const { allJobs, searchedQuery } = useSelector(store => store.job);
+  const { allJobs, searchedQuery } = useSelector((store) => store.job);
 
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedLocations, setSelectedLocations] = useState([]);
 
-  /* ✅ RESET FILTERS ON PAGE LOAD / REFRESH */
+  /* ✅ RESET FILTERS ON PAGE LOAD */
   useEffect(() => {
     setSelectedLocations([]);
   }, []);
@@ -24,17 +42,18 @@ const Jobs = () => {
     // 🔍 Search filter
     if (searchedQuery) {
       const q = searchedQuery.toLowerCase();
-      jobs = jobs.filter(job =>
-        job?.title?.toLowerCase().includes(q) ||
-        job?.description?.toLowerCase().includes(q) ||
-        job?.location?.toLowerCase().includes(q)
+      jobs = jobs.filter(
+        (job) =>
+          job?.title?.toLowerCase().includes(q) ||
+          job?.description?.toLowerCase().includes(q) ||
+          job?.location?.toLowerCase().includes(q)
       );
     }
 
-    // 📍 Location filter (OR logic)
+    // 📍 Location filter
     if (selectedLocations.length > 0) {
-      jobs = jobs.filter(job =>
-        selectedLocations.some(location =>
+      jobs = jobs.filter((job) =>
+        selectedLocations.some((location) =>
           job?.location?.toLowerCase().includes(location.toLowerCase())
         )
       );
@@ -44,25 +63,36 @@ const Jobs = () => {
   }, [allJobs, searchedQuery, selectedLocations]);
 
   return (
-    <div>
+    <>
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 mt-4">
-
-        {/* Filter Button */}
-        <div className="mb-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-7xl mx-auto px-4 mt-4"
+      >
+        {/* 🔹 Filter Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4"
+        >
           <button
             onClick={() => setIsFilterOpen(true)}
             className="px-4 py-2 bg-[#6A38C2] text-white rounded-md text-sm"
           >
             Filter Jobs
           </button>
-        </div>
+        </motion.div>
 
-        {/* Active Filters */}
+        {/* 🔹 Active Filters */}
         {selectedLocations.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {selectedLocations.map(location => (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-4 flex flex-wrap gap-2"
+          >
+            {selectedLocations.map((location) => (
               <span
                 key={location}
                 className="px-3 py-1 bg-purple-100 text-[#6A38C2] text-sm rounded-full"
@@ -70,38 +100,48 @@ const Jobs = () => {
                 {location}
               </span>
             ))}
-          </div>
+          </motion.div>
         )}
 
-        {/* Jobs */}
+        {/* 🔹 Jobs Grid */}
         {filteredJobs.length === 0 ? (
-          <p className="text-gray-500">No Jobs Found</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-gray-500"
+          >
+            No Jobs Found
+          </motion.p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredJobs.map(job => (
-              <motion.div
-                key={job._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            {filteredJobs.map((job) => (
+              <motion.div key={job._id} variants={itemVariants}>
                 <Job job={job} />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
-      {/* Filter Overlay */}
+      {/* 🔹 Filter Overlay */}
       {isFilterOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+        >
           <FilterCard
             onApply={(locations) => setSelectedLocations(locations)}
             onClose={() => setIsFilterOpen(false)}
           />
-        </div>
+        </motion.div>
       )}
-    </div>
+    </>
   );
 };
 

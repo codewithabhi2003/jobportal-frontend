@@ -76,7 +76,7 @@ const Navbar = () => {
                   <li><Link to="/">Home</Link></li>
                   <li onClick={handleAboutClick} className="cursor-pointer">About</li> {/* ✅ 2nd */}
                   <li><Link to="/jobs">Jobs</Link></li>
-                  <li><Link to="/browse">Browse</Link></li>
+                  <li><Link to="/bookmark">Bookmark</Link></li>
                 </>
               )}
             </ul>
@@ -163,8 +163,8 @@ const Navbar = () => {
             <Link onClick={() => setOpenMenu(false)} to="/jobs" className="px-4 py-3">
               Jobs
             </Link>
-            <Link onClick={() => setOpenMenu(false)} to="/browse" className="px-4 py-3">
-              Browse
+            <Link onClick={() => setOpenMenu(false)} to="/bookmark" className="px-4 py-3">
+              Bookmark
             </Link>
           </nav>
         </div>
