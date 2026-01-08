@@ -40,9 +40,9 @@ const About = () => {
             About <span className="text-[#6A38C2]">JobPortal</span>
           </h2>
           <p className="mt-4 text-gray-600 text-sm sm:text-base">
-            JobPortal is a modern job-hunting platform designed to connect talented
-            professionals with trusted companies. We make job searching simple,
-            fast, and effective.
+            JobPortal is a modern job-hunting platform designed to connect
+            talented professionals with trusted companies. We make job searching
+            simple, fast, and effective.
           </p>
         </motion.div>
 
@@ -64,8 +64,8 @@ const About = () => {
               Find the Right Job
             </h3>
             <p className="text-sm text-gray-600 mt-2">
-              Browse thousands of job listings tailored to your skills, experience,
-              and career goals.
+              Browse thousands of job listings tailored to your skills,
+              experience, and career goals.
             </p>
           </motion.div>
 
@@ -100,8 +100,26 @@ const About = () => {
               Grow Your Career
             </h3>
             <p className="text-sm text-gray-600 mt-2">
-              Apply easily, track applications, and take the next step toward your
-              dream career.
+              Apply easily, track applications, and take the next step toward
+              your dream career.
+            </p>
+          </motion.div>
+
+          {/* Feature 4 */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ y: -6 }}
+            className="p-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition bg-white"
+          >
+            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-[#6A38C2] mb-4">
+              <Users />
+            </div>
+            <h3 className="font-semibold text-lg text-gray-900">
+              Track Applications Easily
+            </h3>
+            <p className="text-sm text-gray-600 mt-2">
+              Stay updated on all your job applications with real-time status
+              tracking, so you always know where you stand.
             </p>
           </motion.div>
         </motion.div>

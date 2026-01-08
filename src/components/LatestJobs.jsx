@@ -70,7 +70,7 @@ const LatestJobs = () => {
       </motion.div>
 
       {/* 🔹 View More Button */}
-      {allJobs.length > 3 && (
+      {allJobs.length > 4 && (
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
