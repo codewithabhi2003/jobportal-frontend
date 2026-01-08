@@ -46,9 +46,13 @@ const Navbar = () => {
     <header className="w-full bg-white shadow-md relative z-50">
       <div className="max-w-7xl mx-auto h-16 px-4 sm:px-6 flex items-center justify-between">
 
-        {/* LEFT - MENU */}
-        <button className="md:hidden" onClick={() => setOpenMenu(true)}>
-          <Menu size={26} />
+        {/* LEFT - MENU BUTTON */}
+        <button
+          className="md:hidden"
+          onClick={() => setOpenMenu(prev => !prev)}   // ✅ TOGGLE FIX
+          aria-label="Toggle menu"
+        >
+          {openMenu ? <X size={26} /> : <Menu size={26} />}
         </button>
 
         {/* LOGO */}
@@ -56,10 +60,10 @@ const Navbar = () => {
           Job<span className="text-[#F83002]">Portal</span>
         </h1>
 
-        {/* RIGHT */}
+        {/* RIGHT SIDE */}
         <div className="flex items-center gap-3">
 
-          {/* ===== DESKTOP ===== */}
+          {/* ===== DESKTOP MENU ===== */}
           <div className="hidden md:flex items-center gap-10">
             <ul className="flex gap-6 font-medium text-gray-700">
               {user?.role === "Recruiter" ? (
@@ -70,16 +74,18 @@ const Navbar = () => {
               ) : (
                 <>
                   <li><Link to="/">Home</Link></li>
+                  <li onClick={handleAboutClick} className="cursor-pointer">About</li> {/* ✅ 2nd */}
                   <li><Link to="/jobs">Jobs</Link></li>
                   <li><Link to="/browse">Browse</Link></li>
-                  <li onClick={handleAboutClick} className="cursor-pointer">About</li>
                 </>
               )}
             </ul>
 
             {!user ? (
               <div className="flex gap-3">
-                <Link to="/login"><Button variant="outline">Login</Button></Link>
+                <Link to="/login">
+                  <Button variant="outline">Login</Button>
+                </Link>
                 <Link to="/signup">
                   <Button className="bg-[#6A38C2] text-white">Signup</Button>
                 </Link>
@@ -93,7 +99,10 @@ const Navbar = () => {
                 </PopoverTrigger>
 
                 <PopoverContent className="w-56 bg-white border shadow-lg rounded-lg">
-                  <Link to="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100"
+                  >
                     <User2 size={18} /> View Profile
                   </Link>
                   <button
@@ -110,7 +119,9 @@ const Navbar = () => {
           {/* ===== MOBILE RIGHT AUTH ===== */}
           {!user ? (
             <div className="md:hidden flex gap-2">
-              <Link to="/login"><Button size="sm" variant="outline">Login</Button></Link>
+              <Link to="/login">
+                <Button size="sm" variant="outline">Login</Button>
+              </Link>
               <Link to="/signup">
                 <Button size="sm" className="bg-[#6A38C2] text-white">Signup</Button>
               </Link>
@@ -139,21 +150,22 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ===== MOBILE MENU (NOT FULL HEIGHT) ===== */}
+      {/* ===== MOBILE MENU ===== */}
       {openMenu && (
         <div className="absolute top-16 left-0 w-72 bg-white shadow-xl border rounded-br-xl">
-          <div className="flex justify-between items-center p-4 border-b">
-            <h2 className="font-semibold">Menu</h2>
-            <button onClick={() => setOpenMenu(false)}>
-              <X size={22} />
-            </button>
-          </div>
-
           <nav className="flex flex-col divide-y">
-            <Link onClick={() => setOpenMenu(false)} to="/" className="px-4 py-3">Home</Link>
-            <Link onClick={() => setOpenMenu(false)} to="/jobs" className="px-4 py-3">Jobs</Link>
-            <Link onClick={() => setOpenMenu(false)} to="/browse" className="px-4 py-3">Browse</Link>
-            <button onClick={handleAboutClick} className="px-4 py-3 text-left">About</button>
+            <Link onClick={() => setOpenMenu(false)} to="/" className="px-4 py-3">
+              Home
+            </Link>
+            <button onClick={handleAboutClick} className="px-4 py-3 text-left">
+              About
+            </button>
+            <Link onClick={() => setOpenMenu(false)} to="/jobs" className="px-4 py-3">
+              Jobs
+            </Link>
+            <Link onClick={() => setOpenMenu(false)} to="/browse" className="px-4 py-3">
+              Browse
+            </Link>
           </nav>
         </div>
       )}
