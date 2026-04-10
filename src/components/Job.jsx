@@ -1,16 +1,15 @@
 import React from 'react';
-import { Button } from './ui/button';
-import { Bookmark } from 'lucide-react';
-import { Avatar, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarImage } from './ui/avatar';
+import { MapPin, Clock, IndianRupee, ArrowUpRight, Bookmark } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { setSavedJobs } from '@/redux/jobSlice';
 import { toast } from 'sonner';
 import { BOOKMARK_API_END_POINT } from '@/utils/constant';
 
-const Job = ({ job }) => {
+const Job = ({ job, index = 0 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -19,211 +18,350 @@ const Job = ({ job }) => {
 
   const isSaved = savedJobs.some(j => j._id === job?._id);
 
-  const daysagoFunction = (mongodbTime) => {
+  const daysAgoFunction = (mongodbTime) => {
     const createdAt = new Date(mongodbTime);
     const currentTime = new Date();
     const timeDifference = currentTime - createdAt;
     return Math.floor(timeDifference / (1000 * 60 * 60 * 24));
   };
 
-  /* ===============================
-     🔖 SAVE / UNSAVE (BACKEND)
-  =============================== */
-  const saveHandler = async () => {
-  if (!user) {
-    toast.error("Login required to save jobs");
-    return;
-  }
+  const daysAgo = daysAgoFunction(job?.createdAt);
 
-  // 🔥 OPTIMISTIC UI UPDATE (instant)
-  const updatedJobs = isSaved
-    ? savedJobs.filter(j => j._id !== job._id)
-    : [...savedJobs, job];
-
-  dispatch(setSavedJobs(updatedJobs));
-
-  try {
-    await axios.post(
-      `${BOOKMARK_API_END_POINT}/${job._id}`,
-      {},
-      { withCredentials: true }
-    );
-  } catch (error) {
-    // ❌ rollback if API fails
-    dispatch(setSavedJobs(savedJobs));
-    toast.error("Bookmark failed");
-  }
-};
-
+  const saveHandler = async (e) => {
+    e.stopPropagation();
+    if (!user) {
+      toast.error("Login required to save jobs");
+      return;
+    }
+    const updatedJobs = isSaved
+      ? savedJobs.filter(j => j._id !== job._id)
+      : [...savedJobs, job];
+    dispatch(setSavedJobs(updatedJobs));
+    try {
+      await axios.post(
+        `${BOOKMARK_API_END_POINT}/${job._id}`,
+        {},
+        { withCredentials: true }
+      );
+    } catch {
+      dispatch(setSavedJobs(savedJobs));
+      toast.error("Bookmark failed");
+    }
+  };
 
   return (
-  <>
-    <style>{`
-      .jcard-root {
-        background: #ffffff;
-        border: 1px solid rgba(114,9,183,0.1);
-        border-radius: 16px;
-        padding: 1.35rem 1.3rem;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.26s cubic-bezier(0.4,0,0.2,1);
-        font-family: 'Outfit', sans-serif;
-        position: relative;
-        overflow: hidden;
-      }
-      .jcard-root::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 2.5px;
-        background: linear-gradient(90deg, #7209b7, #b44bf7);
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.3s ease;
-      }
-      .jcard-root:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 14px 40px rgba(114,9,183,0.1), 0 2px 8px rgba(0,0,0,0.04);
-        border-color: rgba(114,9,183,0.28);
-      }
-      .jcard-root:hover::before {
-        transform: scaleX(1);
-      }
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Outfit:wght@400;500;600&display=swap');
 
-      .jcard-title {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-weight: 800;
-        font-size: 1rem;
-        color: #18003a;
-      }
+        .jcard-root {
+          background: #ffffff;
+          border: 1px solid rgba(114,9,183,0.1);
+          border-radius: 16px;
+          padding: 1.35rem 1.3rem;
+          cursor: pointer;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          transition: all 0.26s cubic-bezier(0.4,0,0.2,1);
+          font-family: 'Outfit', sans-serif;
+          overflow: hidden;
+        }
+        .jcard-root::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 2.5px;
+          background: linear-gradient(90deg, #7209b7, #b44bf7);
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.3s ease;
+          border-radius: 16px 16px 0 0;
+        }
+        .jcard-root:hover {
+          border-color: rgba(114,9,183,0.28);
+          transform: translateY(-5px);
+          box-shadow: 0 14px 40px rgba(114,9,183,0.1), 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .jcard-root:hover::before { transform: scaleX(1); }
 
-      .jcard-root:hover .jcard-title {
-        color: #7209b7;
-      }
+        .jcard-top {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: 0.9rem;
+        }
+        .jcard-co { display: flex; align-items: center; gap: 10px; }
+        .jcard-avatar {
+          width: 42px; height: 42px;
+          border-radius: 10px;
+          border: 1px solid rgba(114,9,183,0.12);
+          overflow: hidden;
+          flex-shrink: 0;
+          background: #f9f5ff;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .jcard-co-name {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #18003a;
+        }
+        .jcard-co-loc {
+          display: flex; align-items: center; gap: 3px;
+          color: #9ca3af;
+          font-size: 0.72rem;
+          margin-top: 1px;
+        }
 
-      .jcard-desc {
-        font-size: 0.82rem;
-        color: #6b7280;
-        line-height: 1.6;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
+        .jcard-top-actions {
+          display: flex; align-items: center; gap: 6px;
+          flex-shrink: 0;
+        }
+        .jcard-bookmark-btn {
+          width: 30px; height: 30px;
+          border-radius: 8px;
+          background: rgba(114,9,183,0.04);
+          border: 1px solid rgba(114,9,183,0.1);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          padding: 0;
+        }
+        .jcard-bookmark-btn:hover {
+          background: rgba(114,9,183,0.1);
+          border-color: rgba(114,9,183,0.3);
+        }
+        .jcard-arrow {
+          width: 30px; height: 30px;
+          border-radius: 8px;
+          background: rgba(114,9,183,0.06);
+          border: 1px solid rgba(114,9,183,0.12);
+          display: flex; align-items: center; justify-content: center;
+          color: #b084d8;
+          flex-shrink: 0;
+          transition: all 0.2s;
+        }
+        .jcard-root:hover .jcard-arrow {
+          background: rgba(114,9,183,0.1);
+          color: #7209b7;
+          border-color: rgba(114,9,183,0.3);
+        }
 
-      .pill {
-        background: #f9f5ff;
-        border: 1px solid rgba(114,9,183,0.1);
-        border-radius: 7px;
-        padding: 0.25rem 0.65rem;
-        font-size: 0.74rem;
-        color: #6b7280;
-      }
+        .jcard-days {
+          font-size: 0.72rem;
+          color: #9ca3af;
+          margin-bottom: 0.35rem;
+          font-family: 'Outfit', sans-serif;
+        }
+        .jcard-title {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 1rem;
+          font-weight: 800;
+          color: #18003a;
+          margin-bottom: 0.4rem;
+          transition: color 0.2s;
+        }
+        .jcard-root:hover .jcard-title { color: #7209b7; }
+        .jcard-desc {
+          color: #6b7280;
+          font-size: 0.82rem;
+          line-height: 1.62;
+          margin-bottom: 0.9rem;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
 
-      .badge-purple {
-        background: rgba(114,9,183,0.07);
-        border: 1px solid rgba(114,9,183,0.18);
-        color: #7209b7;
-      }
+        .jcard-meta {
+          display: flex; flex-wrap: wrap;
+          gap: 0.4rem;
+          margin-bottom: 0.85rem;
+        }
+        .jcard-meta-pill {
+          display: inline-flex; align-items: center; gap: 4px;
+          background: #f9f5ff;
+          border: 1px solid rgba(114,9,183,0.1);
+          border-radius: 7px;
+          padding: 0.25rem 0.65rem;
+          color: #6b7280;
+          font-size: 0.74rem;
+        }
 
-      .badge-pink {
-        background: rgba(247,37,133,0.06);
-        border: 1px solid rgba(247,37,133,0.18);
-        color: #c4106a;
-      }
-    `}</style>
+        .jcard-footer {
+          display: flex; align-items: center;
+          justify-content: space-between;
+          padding-top: 0.85rem;
+          border-top: 1px solid rgba(114,9,183,0.07);
+          margin-top: auto;
+        }
+        .jcard-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .jcard-badge {
+          padding: 0.22rem 0.65rem;
+          border-radius: 7px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          font-family: 'Outfit', sans-serif;
+        }
+        .jcard-badge-type {
+          background: rgba(114,9,183,0.07);
+          border: 1px solid rgba(114,9,183,0.18);
+          color: #7209b7;
+        }
+        .jcard-badge-pos {
+          background: rgba(247,37,133,0.06);
+          border: 1px solid rgba(247,37,133,0.18);
+          color: #c4106a;
+        }
+        .jcard-salary {
+          display: flex; align-items: center; gap: 2px;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #7209b7;
+        }
+        .jcard-salary-lbl {
+          color: #9ca3af;
+          font-size: 0.68rem;
+          font-weight: 400;
+          text-align: right;
+          font-family: 'Outfit', sans-serif;
+        }
 
-    <div className="jcard-root">
+        .jcard-actions {
+          display: flex;
+          gap: 0.5rem;
+          margin-top: 0.85rem;
+          flex-wrap: wrap;
+        }
+        .jcard-btn {
+          flex: 1;
+          min-width: 100px;
+          padding: 0.45rem 0.9rem;
+          border-radius: 9px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          border: none;
+          text-align: center;
+        }
+        .jcard-btn-details {
+          background: #f9f5ff;
+          border: 1px solid rgba(114,9,183,0.18);
+          color: #7209b7;
+        }
+        .jcard-btn-details:hover {
+          background: rgba(114,9,183,0.12);
+        }
+        .jcard-btn-save {
+          background: #7209b7;
+          color: #fff;
+        }
+        .jcard-btn-save:hover {
+          background: #5e0894;
+        }
+        .jcard-btn-saved {
+          background: #16a34a;
+          color: #fff;
+        }
+        .jcard-btn-saved:hover {
+          background: #15803d;
+        }
+      `}</style>
 
-      {/* Top */}
-      <div className="flex justify-between items-start mb-3">
-        <p className="text-xs text-gray-400">
-          {daysagoFunction(job?.createdAt) === 0
-            ? "Today"
-            : `${daysagoFunction(job?.createdAt)} days ago`}
-        </p>
+      <motion.div
+        className="jcard-root"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.38, delay: index * 0.07, ease: "easeOut" }}
+        onClick={() => navigate(`/description/${job?._id}`)}
+      >
+        {/* Top Row: Company info + Bookmark + Arrow */}
+        <div className="jcard-top">
+          <div className="jcard-co">
+            <div className="jcard-avatar">
+              <Avatar style={{ width: "100%", height: "100%", borderRadius: 0 }}>
+                <AvatarImage src={job?.company?.logo} />
+              </Avatar>
+            </div>
+            <div>
+              <div className="jcard-co-name">{job?.company?.name}</div>
+              <div className="jcard-co-loc"><MapPin size={10} /> India</div>
+            </div>
+          </div>
 
-        <Button
-          onClick={saveHandler}
-          className="rounded-full bg-transparent hover:bg-gray-100"
-          size="icon"
-        >
-          <Bookmark
-            className={`h-4 w-4 ${
-              isSaved ? "text-[#7209b7]" : "text-gray-500"
-            }`}
-            fill={isSaved ? "currentColor" : "none"}
-          />
-        </Button>
-      </div>
-
-      {/* Company */}
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-[42px] h-[42px] rounded-[10px] border border-purple-100 overflow-hidden flex items-center justify-center bg-[#f9f5ff]">
-          <Avatar className="w-full h-full">
-            <AvatarImage src={job?.company?.logo} />
-          </Avatar>
+          <div className="jcard-top-actions">
+            {/* Bookmark button */}
+            <button
+              className="jcard-bookmark-btn"
+              onClick={saveHandler}
+              title={isSaved ? "Remove bookmark" : "Save job"}
+            >
+              <Bookmark
+                size={13}
+                color={isSaved ? "#7209b7" : "#b084d8"}
+                fill={isSaved ? "#7209b7" : "none"}
+              />
+            </button>
+            {/* Arrow */}
+            <div className="jcard-arrow"><ArrowUpRight size={13} /></div>
+          </div>
         </div>
 
-        <div>
-          <p className="font-bold text-sm text-[#18003a]">
-            {job?.company?.name}
-          </p>
-          <p className="text-[11px] text-gray-400">India</p>
+        {/* Days ago */}
+        <div className="jcard-days">
+          {daysAgo === 0 ? "Posted today" : `Posted ${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago`}
         </div>
-      </div>
 
-      {/* Title + Desc */}
-      <div className="mb-3">
-        <h1 className="jcard-title">{job?.title}</h1>
+        {/* Title & Description */}
+        <div className="jcard-title">{job?.title}</div>
         <p className="jcard-desc">{job?.description}</p>
-      </div>
 
-      {/* Meta Pills */}
-      <div className="flex gap-2 mb-3 flex-wrap">
-        <span className="pill">Full-time</span>
-        <span className="pill">On-site</span>
-      </div>
-
-      {/* Footer */}
-      <div className="flex justify-between items-center mt-auto pt-3 border-t border-purple-100">
-
-        <div className="flex gap-2 flex-wrap">
-          <span className="pill badge-purple">{job?.jobType}</span>
-          <span className="pill badge-pink">{job?.position} Pos.</span>
+        {/* Meta pills */}
+        <div className="jcard-meta">
+          <span className="jcard-meta-pill"><Clock size={11} /> Full-time</span>
+          <span className="jcard-meta-pill"><MapPin size={11} /> On-site</span>
         </div>
 
-        <div className="text-right">
-          <p className="font-extrabold text-sm text-[#7209b7]">
-            ₹{job?.salary} LPA
-          </p>
-          <span className="text-[10px] text-gray-400">Salary</span>
+        {/* Footer: badges + salary */}
+        <div className="jcard-footer">
+          <div className="jcard-badges">
+            <span className="jcard-badge jcard-badge-type">{job?.jobType}</span>
+            <span className="jcard-badge jcard-badge-pos">{job?.position} Pos.</span>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div className="jcard-salary"><IndianRupee size={13} />{job?.salary} LPA</div>
+            <div className="jcard-salary-lbl">Salary</div>
+          </div>
         </div>
-      </div>
 
-      {/* Actions */}
-      <div className="flex gap-2 mt-4">
-        <Button
-          onClick={() => navigate(`/description/${job?._id}`)}
-          className="w-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+        {/* Action buttons */}
+        <div
+          className="jcard-actions"
+          onClick={(e) => e.stopPropagation()}
         >
-          Details
-        </Button>
-
-        <Button
-          onClick={saveHandler}
-          className={`w-full text-white ${
-            isSaved ? "bg-green-600" : "bg-[#7209b7]"
-          }`}
-        >
-          {isSaved ? "Saved" : "Save"}
-        </Button>
-      </div>
-
-    </div>
-  </>
-);
+          <button
+            className="jcard-btn jcard-btn-details"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/description/${job?._id}`);
+            }}
+          >
+            Details
+          </button>
+          <button
+            className={`jcard-btn ${isSaved ? "jcard-btn-saved" : "jcard-btn-save"}`}
+            onClick={saveHandler}
+          >
+            {isSaved ? "Saved" : "Save For Later"}
+          </button>
+        </div>
+      </motion.div>
+    </>
+  );
 };
 
 export default Job;
