@@ -10,6 +10,8 @@ import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
 
+const NAV_H = 66; // navbar height in px — keep in sync with Home.jsx paddingTop
+
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
@@ -19,9 +21,9 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const fn = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
   const logoutHandler = async () => {
@@ -63,197 +65,278 @@ const Navbar = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap');
-        :root {
-          --jp-primary: #7209b7;
-          --jp-primary-light: #9b2dca;
-          --jp-primary-dark: #560a8c;
-          --jp-accent: #f72585;
-          --jp-bg: #07000f;
-          --jp-surface: #110020;
-          --jp-border: rgba(114, 9, 183, 0.2);
-          --jp-text: #f0e8ff;
-          --jp-muted: rgba(240,232,255,0.5);
-          --jp-font-display: 'Plus Jakarta Sans', sans-serif;
-          --jp-font-body: 'Outfit', sans-serif;
-        }
-        .jp-nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          font-family: var(--jp-font-body);
-          transition: background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
-        }
-        .jp-nav.scrolled {
-          background: rgba(7,0,15,0.88);
-          backdrop-filter: blur(24px) saturate(180%);
-          box-shadow: 0 1px 0 rgba(114,9,183,0.25), 0 8px 32px rgba(0,0,0,0.5);
-        }
-        .jp-nav.top { background: transparent; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600&display=swap');
 
-        .jp-inner {
-          max-width: 1280px; margin: 0 auto;
-          height: 68px; padding: 0 1.5rem;
-          display: flex; align-items: center; justify-content: space-between;
+        /* ---- scoped to navbar only, all names prefixed jpnav- ---- */
+        .jpnav-root {
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          z-index: 9999;
+          height: ${NAV_H}px;
+          background: #ffffff;
+          border-bottom: 1px solid #f0e8ff;
+          transition: box-shadow 0.25s ease;
+          font-family: 'Outfit', sans-serif;
         }
-        .jp-logo {
-          font-family: var(--jp-font-display);
-          font-weight: 800; font-size: 1.4rem;
-          color: #fff; letter-spacing: -0.03em;
-          text-decoration: none; display: flex; align-items: center; gap: 2px;
+        .jpnav-root.jpnav-scrolled {
+          box-shadow: 0 4px 24px rgba(114,9,183,0.08), 0 1px 0 rgba(114,9,183,0.06);
         }
-        .jp-logo-dot {
-          width: 8px; height: 8px; border-radius: 50%;
-          background: var(--jp-accent);
-          display: inline-block; margin-left: 2px;
+        .jpnav-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          height: 100%;
+          padding: 0 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1.5rem;
         }
-        .jp-links { display: flex; align-items: center; gap: 2rem; }
-        .jp-link {
-          color: var(--jp-muted);
-          font-size: 0.88rem; font-weight: 500; letter-spacing: 0.01em;
-          text-decoration: none; background: none; border: none; cursor: pointer;
-          position: relative; padding: 0.2rem 0;
-          transition: color 0.2s;
-          font-family: var(--jp-font-body);
+        /* Logo */
+        .jpnav-logo {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 800;
+          font-size: 1.3rem;
+          letter-spacing: -0.03em;
+          color: #18003a;
+          text-decoration: none;
+          flex-shrink: 0;
+          line-height: 1;
         }
-        .jp-link::after {
-          content: ''; position: absolute; bottom: -3px; left: 0;
-          width: 0; height: 2px;
-          background: linear-gradient(90deg, var(--jp-primary), var(--jp-accent));
-          border-radius: 2px;
-          transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
-        }
-        .jp-link:hover { color: #fff; }
-        .jp-link:hover::after { width: 100%; }
+        .jpnav-logo-accent { color: #7209b7; }
 
-        .jp-auth { display: flex; align-items: center; gap: 0.75rem; }
-        .jp-btn-outline {
-          font-family: var(--jp-font-body); font-weight: 500; font-size: 0.85rem;
-          color: rgba(240,232,255,0.75); background: transparent;
-          border: 1px solid rgba(114,9,183,0.4); border-radius: 8px;
-          padding: 0.45rem 1.1rem; cursor: pointer; text-decoration: none;
-          transition: all 0.2s; display: inline-flex; align-items: center;
+        /* Desktop links */
+        .jpnav-links {
+          display: flex;
+          align-items: center;
+          gap: 0.15rem;
+          flex: 1;
+          justify-content: center;
         }
-        .jp-btn-outline:hover {
-          border-color: var(--jp-primary);
-          color: #fff; background: rgba(114,9,183,0.1);
+        .jpnav-link {
+          font-family: 'Outfit', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #4b5563;
+          text-decoration: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0.45rem 0.9rem;
+          border-radius: 8px;
+          transition: color 0.18s, background 0.18s;
+          line-height: 1;
         }
-        .jp-btn-fill {
-          font-family: var(--jp-font-body); font-weight: 600; font-size: 0.85rem;
-          color: #fff; background: var(--jp-primary);
-          border: none; border-radius: 8px;
-          padding: 0.45rem 1.2rem; cursor: pointer; text-decoration: none;
-          transition: all 0.2s; display: inline-flex; align-items: center;
-          box-shadow: 0 4px 20px rgba(114,9,183,0.35);
+        .jpnav-link:hover {
+          color: #7209b7;
+          background: rgba(114,9,183,0.06);
         }
-        .jp-btn-fill:hover {
-          background: var(--jp-primary-light);
+
+        /* Auth buttons */
+        .jpnav-auth {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          flex-shrink: 0;
+        }
+        .jpnav-btn-login {
+          font-family: 'Outfit', sans-serif;
+          font-weight: 500;
+          font-size: 0.875rem;
+          color: #7209b7;
+          background: transparent;
+          border: 1.5px solid rgba(114,9,183,0.3);
+          border-radius: 9px;
+          padding: 0.45rem 1.1rem;
+          cursor: pointer;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          transition: all 0.2s;
+          line-height: 1;
+        }
+        .jpnav-btn-login:hover {
+          border-color: #7209b7;
+          background: rgba(114,9,183,0.04);
+        }
+        .jpnav-btn-signup {
+          font-family: 'Outfit', sans-serif;
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: #fff;
+          background: #7209b7;
+          border: none;
+          border-radius: 9px;
+          padding: 0.5rem 1.2rem;
+          cursor: pointer;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          transition: all 0.2s;
+          box-shadow: 0 3px 12px rgba(114,9,183,0.25);
+          line-height: 1;
+        }
+        .jpnav-btn-signup:hover {
+          background: #5c0799;
           transform: translateY(-1px);
-          box-shadow: 0 6px 28px rgba(114,9,183,0.5);
+          box-shadow: 0 5px 18px rgba(114,9,183,0.35);
         }
-        .jp-avatar-wrap {
-          width: 38px; height: 38px; border-radius: 50%;
-          border: 2px solid rgba(114,9,183,0.5);
-          overflow: hidden; cursor: pointer;
+
+        /* Avatar */
+        .jpnav-avatar {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          border: 2px solid rgba(114,9,183,0.25);
+          overflow: hidden;
+          cursor: pointer;
           transition: border-color 0.2s, box-shadow 0.2s;
+          flex-shrink: 0;
         }
-        .jp-avatar-wrap:hover {
-          border-color: var(--jp-primary);
-          box-shadow: 0 0 0 3px rgba(114,9,183,0.2);
+        .jpnav-avatar:hover {
+          border-color: #7209b7;
+          box-shadow: 0 0 0 3px rgba(114,9,183,0.1);
         }
-        .jp-popover-content {
-          background: #110020 !important;
-          border: 1px solid rgba(114,9,183,0.25) !important;
-          border-radius: 12px !important;
-          padding: 0.4rem !important;
-          min-width: 190px;
-          box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(114,9,183,0.1) !important;
+
+        /* Popover */
+        .jpnav-pop {
+          background: #ffffff !important;
+          border: 1px solid rgba(114,9,183,0.1) !important;
+          border-radius: 14px !important;
+          padding: 0.35rem !important;
+          min-width: 200px;
+          box-shadow: 0 8px 30px rgba(114,9,183,0.1), 0 2px 8px rgba(0,0,0,0.05) !important;
         }
-        .jp-pop-item {
-          display: flex; align-items: center; gap: 10px;
-          padding: 0.6rem 0.85rem; border-radius: 8px;
-          color: rgba(240,232,255,0.7); font-size: 0.875rem;
-          font-family: var(--jp-font-body); font-weight: 400;
-          text-decoration: none; background: none; border: none;
-          width: 100%; text-align: left; cursor: pointer;
+        .jpnav-pop-head {
+          padding: 0.65rem 0.9rem 0.7rem;
+          border-bottom: 1px solid rgba(114,9,183,0.07);
+          margin-bottom: 0.3rem;
+        }
+        .jpnav-pop-name {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #18003a;
+          margin: 0;
+        }
+        .jpnav-pop-email {
+          font-size: 0.75rem;
+          color: #9ca3af;
+          margin: 2px 0 0;
+          font-family: 'Outfit', sans-serif;
+        }
+        .jpnav-pop-item {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          padding: 0.55rem 0.9rem;
+          border-radius: 9px;
+          color: #374151;
+          font-size: 0.86rem;
+          font-family: 'Outfit', sans-serif;
+          font-weight: 500;
+          text-decoration: none;
+          background: none;
+          border: none;
+          width: 100%;
+          text-align: left;
+          cursor: pointer;
           transition: all 0.15s;
         }
-        .jp-pop-item:hover { background: rgba(114,9,183,0.15); color: #fff; }
-        .jp-pop-item.danger { color: #f72585; }
-        .jp-pop-item.danger:hover { background: rgba(247,37,133,0.1); }
-        .jp-pop-divider {
-          height: 1px; background: rgba(114,9,183,0.15); margin: 0.3rem 0.5rem;
+        .jpnav-pop-item:hover { background: rgba(114,9,183,0.06); color: #7209b7; }
+        .jpnav-pop-item.jpnav-danger { color: #dc2626; }
+        .jpnav-pop-item.jpnav-danger:hover { background: rgba(220,38,38,0.05); }
+        .jpnav-pop-divider { height: 1px; background: rgba(114,9,183,0.07); margin: 0.2rem 0.5rem; }
+
+        /* Hamburger */
+        .jpnav-burger {
+          background: none;
+          border: 1.5px solid rgba(114,9,183,0.18);
+          border-radius: 9px;
+          padding: 0.45rem;
+          color: #7209b7;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          transition: all 0.18s;
+        }
+        .jpnav-burger:hover {
+          background: rgba(114,9,183,0.06);
+          border-color: rgba(114,9,183,0.4);
         }
 
-        .jp-hamburger {
-          background: none; border: 1px solid rgba(114,9,183,0.3);
-          border-radius: 8px; padding: 0.5rem;
-          color: rgba(240,232,255,0.7); cursor: pointer;
-          display: flex; align-items: center;
-          transition: all 0.2s;
+        /* Mobile drawer */
+        .jpnav-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.15);
+          z-index: 9998;
+          backdrop-filter: blur(2px);
         }
-        .jp-hamburger:hover {
-          border-color: var(--jp-primary); color: #fff;
-          background: rgba(114,9,183,0.1);
-        }
-
-        .jp-drawer {
-          position: fixed; top: 68px; left: 0; bottom: 0; width: 300px;
-          background: #0a0018;
-          border-right: 1px solid rgba(114,9,183,0.2);
-          z-index: 99; padding: 1.5rem;
-          display: flex; flex-direction: column; gap: 0.25rem;
+        .jpnav-drawer {
+          position: fixed;
+          top: ${NAV_H}px;
+          left: 0;
+          bottom: 0;
+          width: 280px;
+          background: #ffffff;
+          border-right: 1px solid rgba(114,9,183,0.09);
+          z-index: 9999;
+          padding: 1rem 0.75rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.1rem;
+          box-shadow: 4px 0 20px rgba(114,9,183,0.07);
           overflow-y: auto;
         }
-        .jp-drawer-link {
-          display: flex; align-items: center; gap: 12px;
-          color: rgba(240,232,255,0.6); font-size: 1rem;
-          font-family: var(--jp-font-body); font-weight: 400;
-          padding: 0.85rem 1rem; border-radius: 10px;
-          text-decoration: none; background: none; border: none;
-          width: 100%; text-align: left; cursor: pointer;
-          transition: all 0.2s;
+        .jpnav-drawer-link {
+          display: block;
+          color: #374151;
+          font-size: 0.95rem;
+          font-family: 'Outfit', sans-serif;
+          font-weight: 500;
+          padding: 0.8rem 1rem;
+          border-radius: 10px;
+          text-decoration: none;
+          background: none;
+          border: none;
+          width: 100%;
+          text-align: left;
+          cursor: pointer;
+          transition: all 0.18s;
         }
-        .jp-drawer-link:hover {
-          background: rgba(114,9,183,0.12); color: #fff;
-        }
-        .jp-drawer-divider {
-          height: 1px; background: rgba(114,9,183,0.12);
-          margin: 0.5rem 0;
-        }
-        .jp-overlay {
-          position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-          z-index: 98; backdrop-filter: blur(4px);
-        }
+        .jpnav-drawer-link:hover { background: rgba(114,9,183,0.07); color: #7209b7; }
+        .jpnav-drawer-sep { height: 1px; background: rgba(114,9,183,0.08); margin: 0.5rem 0.5rem; }
 
-        @media (max-width: 767px) { .jp-desktop-only { display: none !important; } }
-        @media (min-width: 768px) { .jp-mobile-only { display: none !important; } }
+        @media (max-width: 767px) { .jpnav-desktop { display: none !important; } }
+        @media (min-width: 768px) { .jpnav-mobile { display: none !important; } }
       `}</style>
 
-      <header className={`jp-nav ${scrolled ? "scrolled" : "top"}`}>
-        <div className="jp-inner">
-          {/* Hamburger — mobile */}
+      <header className={`jpnav-root${scrolled ? " jpnav-scrolled" : ""}`}>
+        <div className="jpnav-inner">
+
+          {/* Hamburger — mobile only */}
           <button
-            className="jp-hamburger jp-mobile-only"
+            className="jpnav-burger jpnav-mobile"
             onClick={() => setOpenMenu((p) => !p)}
             aria-label="Toggle menu"
           >
-            {openMenu ? <X size={20} /> : <Menu size={20} />}
+            {openMenu ? <X size={19} /> : <Menu size={19} />}
           </button>
 
           {/* Logo */}
-          <Link to="/" className="jp-logo">
-            Job<span style={{ color: "var(--jp-primary)" }}>Portal</span>
-            <span className="jp-logo-dot" />
+          <Link to="/" className="jpnav-logo">
+            Job<span className="jpnav-logo-accent">Portal</span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="jp-links jp-desktop-only">
+          <nav className="jpnav-links jpnav-desktop">
             {navLinks.map((link) =>
               link.action ? (
-                <button key={link.label} className="jp-link" onClick={link.action}>
+                <button key={link.label} className="jpnav-link" onClick={link.action}>
                   {link.label}
                 </button>
               ) : (
-                <Link key={link.label} to={link.to} className="jp-link">
+                <Link key={link.label} to={link.to} className="jpnav-link">
                   {link.label}
                 </Link>
               )
@@ -261,35 +344,31 @@ const Navbar = () => {
           </nav>
 
           {/* Auth */}
-          <div className="jp-auth">
+          <div className="jpnav-auth">
             {!user ? (
               <>
-                <Link to="/login" className="jp-btn-outline jp-desktop-only">Login</Link>
-                <Link to="/signup" className="jp-btn-fill">Sign Up</Link>
+                <Link to="/login" className="jpnav-btn-login jpnav-desktop">Login</Link>
+                <Link to="/signup" className="jpnav-btn-signup">Sign Up</Link>
               </>
             ) : (
               <Popover>
                 <PopoverTrigger asChild>
-                  <div className="jp-avatar-wrap">
+                  <div className="jpnav-avatar">
                     <Avatar style={{ width: "100%", height: "100%" }}>
                       <AvatarImage src={user?.profile?.profilePhoto} />
                     </Avatar>
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="jp-popover-content" style={{ zIndex: 200 }}>
-                  <div style={{ padding: "0.5rem 0.85rem 0.75rem", borderBottom: "1px solid rgba(114,9,183,0.15)", marginBottom: "0.3rem" }}>
-                    <p style={{ fontFamily: "var(--jp-font-body)", fontSize: "0.9rem", color: "#fff", fontWeight: 600, margin: 0 }}>
-                      {user?.fullname || "User"}
-                    </p>
-                    <p style={{ fontFamily: "var(--jp-font-body)", fontSize: "0.78rem", color: "rgba(240,232,255,0.45)", margin: "2px 0 0" }}>
-                      {user?.email}
-                    </p>
+                <PopoverContent className="jpnav-pop" style={{ zIndex: 10000 }}>
+                  <div className="jpnav-pop-head">
+                    <p className="jpnav-pop-name">{user?.fullname || "User"}</p>
+                    <p className="jpnav-pop-email">{user?.email}</p>
                   </div>
-                  <Link to="/profile" className="jp-pop-item">
+                  <Link to="/profile" className="jpnav-pop-item">
                     <User2 size={15} /> View Profile
                   </Link>
-                  <div className="jp-pop-divider" />
-                  <button onClick={logoutHandler} className="jp-pop-item danger">
+                  <div className="jpnav-pop-divider" />
+                  <button onClick={logoutHandler} className="jpnav-pop-item jpnav-danger">
                     <LogOut size={15} /> Logout
                   </button>
                 </PopoverContent>
@@ -299,41 +378,30 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* Mobile Overlay */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {openMenu && (
           <>
             <motion.div
-              className="jp-overlay jp-mobile-only"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              className="jpnav-overlay jpnav-mobile"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setOpenMenu(false)}
             />
             <motion.aside
-              className="jp-drawer jp-mobile-only"
-              initial={{ x: -300 }}
-              animate={{ x: 0 }}
-              exit={{ x: -300 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="jpnav-drawer jpnav-mobile"
+              initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
             >
-              <div style={{ marginBottom: "1rem" }}>
-                <span className="jp-logo" style={{ fontSize: "1.2rem" }}>
-                  Job<span style={{ color: "var(--jp-primary)" }}>Portal</span>
-                  <span className="jp-logo-dot" />
-                </span>
-              </div>
-              <div className="jp-drawer-divider" />
               {navLinks.map((link) =>
                 link.action ? (
-                  <button key={link.label} className="jp-drawer-link" onClick={link.action}>
+                  <button key={link.label} className="jpnav-drawer-link" onClick={link.action}>
                     {link.label}
                   </button>
                 ) : (
                   <Link
                     key={link.label}
                     to={link.to}
-                    className="jp-drawer-link"
+                    className="jpnav-drawer-link"
                     onClick={() => setOpenMenu(false)}
                   >
                     {link.label}
@@ -342,8 +410,8 @@ const Navbar = () => {
               )}
               {!user && (
                 <>
-                  <div className="jp-drawer-divider" />
-                  <Link to="/login" className="jp-drawer-link" onClick={() => setOpenMenu(false)}>
+                  <div className="jpnav-drawer-sep" />
+                  <Link to="/login" className="jpnav-drawer-link" onClick={() => setOpenMenu(false)}>
                     Login
                   </Link>
                 </>

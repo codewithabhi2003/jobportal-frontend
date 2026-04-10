@@ -5,22 +5,13 @@ import { setSearchedQuery } from "@/redux/jobSlice";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-const DOTS = Array.from({ length: 60 }, (_, i) => ({
-  id: i,
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  size: Math.random() * 3 + 1.5,
-  delay: Math.random() * 5,
-  duration: Math.random() * 6 + 6,
-}));
-
 const STATS = [
   { icon: Briefcase, value: "50K+", label: "Live Jobs" },
-  { icon: Users, value: "120K+", label: "Companies" },
+  { icon: Users,    value: "12K+", label: "Companies" },
   { icon: TrendingUp, value: "2M+", label: "Job Seekers" },
 ];
 
-const POPULAR = ["UI/UX Designer", "React Developer", "Data Analyst", "Product Manager"];
+const CHIPS = ["UI/UX Designer", "React Developer", "Data Analyst", "Product Manager"];
 
 const HeroSection = () => {
   const [query, setQuery] = useState("");
@@ -28,55 +19,46 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const canvasRef = useRef(null);
 
-  const searchJobHandler = () => {
+  const search = () => {
     dispatch(setSearchedQuery(query));
     navigate("/browse");
   };
 
-  const handleKey = (e) => {
-    if (e.key === "Enter") searchJobHandler();
-  };
-
-  /* ── Animated canvas grid lines ── */
+  /* ── Subtle animated network on light bg ── */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let animId;
-    let w, h;
-
+    let raf;
     const resize = () => {
-      w = canvas.width = canvas.offsetWidth;
-      h = canvas.height = canvas.offsetHeight;
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
     };
     resize();
     window.addEventListener("resize", resize);
 
-    const nodes = Array.from({ length: 28 }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
+    const nodes = Array.from({ length: 32 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
     }));
 
     const draw = () => {
-      ctx.clearRect(0, 0, w, h);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       nodes.forEach((n) => {
-        n.x += n.vx;
-        n.y += n.vy;
-        if (n.x < 0 || n.x > w) n.vx *= -1;
-        if (n.y < 0 || n.y > h) n.vy *= -1;
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
       });
-
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 180) {
-            const alpha = (1 - dist / 180) * 0.22;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < 160) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(114, 9, 183, ${alpha})`;
+            ctx.strokeStyle = `rgba(114,9,183,${(1 - d / 160) * 0.14})`;
             ctx.lineWidth = 1;
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -84,376 +66,312 @@ const HeroSection = () => {
           }
         }
       }
-
       nodes.forEach((n) => {
         ctx.beginPath();
-        ctx.arc(n.x, n.y, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(154, 77, 226, 0.55)";
+        ctx.arc(n.x, n.y, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(114,9,183,0.28)";
         ctx.fill();
       });
-
-      animId = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
     };
     draw();
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-    };
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
   }, []);
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600&display=swap');
-        .hero-root {
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&family=Outfit:wght@400;500;600&display=swap');
+        .hero-wrap {
           position: relative;
-          min-height: 100vh;
-          background: #07000f;
+          background: #f9f5ff;
           overflow: hidden;
-          display: flex; flex-direction: column; justify-content: center;
-          padding-top: 68px;
+          min-height: calc(100vh - 66px);
+          display: flex; align-items: center;
           font-family: 'Outfit', sans-serif;
         }
+        /* large faint circle decorations */
+        .hero-blob1 {
+          position: absolute; top: -120px; right: -100px;
+          width: 500px; height: 500px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(114,9,183,0.08) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .hero-blob2 {
+          position: absolute; bottom: -80px; left: -60px;
+          width: 380px; height: 380px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(114,9,183,0.06) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        /* dot-grid pattern */
+        .hero-dots {
+          position: absolute; inset: 0; pointer-events: none; opacity: 0.55;
+          background-image: radial-gradient(circle, rgba(114,9,183,0.18) 1px, transparent 1px);
+          background-size: 28px 28px;
+        }
         .hero-canvas {
-          position: absolute; inset: 0; width: 100%; height: 100%;
-          pointer-events: none; z-index: 1;
-        }
-        /* Radial glow blobs */
-        .hero-glow-1 {
-          position: absolute; top: -10%; left: -8%;
-          width: 520px; height: 520px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(114,9,183,0.22) 0%, transparent 70%);
-          filter: blur(40px); z-index: 0; pointer-events: none;
-          animation: heroFloat1 12s ease-in-out infinite;
-        }
-        .hero-glow-2 {
-          position: absolute; bottom: 5%; right: -5%;
-          width: 440px; height: 440px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(247,37,133,0.12) 0%, transparent 65%);
-          filter: blur(50px); z-index: 0; pointer-events: none;
-          animation: heroFloat2 14s ease-in-out infinite;
-        }
-        .hero-glow-3 {
-          position: absolute; top: 40%; left: 35%;
-          width: 300px; height: 300px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(155,45,202,0.1) 0%, transparent 70%);
-          filter: blur(60px); z-index: 0; pointer-events: none;
-        }
-        /* Hex grid pattern overlay */
-        .hero-hex-pattern {
-          position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.035;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104'%3E%3Cpolygon points='30,2 58,17 58,47 30,62 2,47 2,17' fill='none' stroke='%237209b7' stroke-width='1'/%3E%3Cpolygon points='30,52 58,67 58,97 30,112 2,97 2,67' fill='none' stroke='%237209b7' stroke-width='1'/%3E%3C/svg%3E");
-        }
-        @keyframes heroFloat1 {
-          0%,100% { transform: translate(0,0) scale(1); }
-          50% { transform: translate(30px, 40px) scale(1.1); }
-        }
-        @keyframes heroFloat2 {
-          0%,100% { transform: translate(0,0) scale(1); }
-          50% { transform: translate(-25px,-30px) scale(1.08); }
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
+          pointer-events: none;
         }
 
-        .hero-content {
+        .hero-inner {
           position: relative; z-index: 2;
           max-width: 1280px; margin: 0 auto;
-          padding: 4rem 1.5rem 3rem;
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 3rem; align-items: center;
+          padding: 4.5rem 1.5rem 4rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+          align-items: center;
+          width: 100%;
         }
         @media (max-width: 900px) {
-          .hero-content { grid-template-columns: 1fr; gap: 2rem; }
-          .hero-right { display: none; }
+          .hero-inner { grid-template-columns: 1fr; }
+          .hero-right-col { display: none; }
         }
 
+        /* Badge */
         .hero-badge {
           display: inline-flex; align-items: center; gap: 8px;
-          padding: 0.4rem 1rem; border-radius: 999px;
-          border: 1px solid rgba(114,9,183,0.35);
-          background: rgba(114,9,183,0.1);
-          color: #c77dff; font-size: 0.8rem; font-weight: 500;
-          letter-spacing: 0.04em; margin-bottom: 1.25rem;
+          background: rgba(114,9,183,0.08);
+          border: 1px solid rgba(114,9,183,0.2);
+          border-radius: 999px;
+          padding: 0.38rem 1rem;
+          color: #7209b7;
+          font-size: 0.78rem; font-weight: 600;
+          letter-spacing: 0.04em; text-transform: uppercase;
+          margin-bottom: 1.25rem;
         }
         .hero-badge-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: #7209b7;
-          box-shadow: 0 0 8px #9b2dca;
-          animation: pulseDot 2s ease-in-out infinite;
+          width: 6px; height: 6px; border-radius: 50%; background: #7209b7;
+          animation: hbPulse 2s ease-in-out infinite;
         }
-        @keyframes pulseDot {
-          0%,100%{ opacity:1; transform:scale(1); }
-          50%{ opacity:0.5; transform:scale(0.7); }
-        }
+        @keyframes hbPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.65)} }
 
-        .hero-title {
+        /* Heading */
+        .hero-h1 {
           font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: clamp(2.4rem, 5vw, 3.8rem);
+          font-size: clamp(2.2rem, 4.5vw, 3.6rem);
           font-weight: 900;
-          color: #f0e8ff;
+          color: #18003a;
           line-height: 1.1;
           letter-spacing: -0.035em;
-          margin: 0 0 1.25rem;
+          margin: 0 0 1.2rem;
         }
-        .hero-title-accent {
-          background: linear-gradient(135deg, #9b2dca 0%, #c77dff 50%, #f72585 100%);
+        .hero-h1-grad {
+          background: linear-gradient(135deg, #7209b7 0%, #b44bf7 100%);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
 
+        /* Sub */
         .hero-sub {
-          color: rgba(240,232,255,0.55);
-          font-size: 1.05rem; font-weight: 400; line-height: 1.7;
-          max-width: 480px; margin-bottom: 2rem;
+          color: #6b7280;
+          font-size: 1.05rem;
+          line-height: 1.72;
+          max-width: 460px;
+          margin-bottom: 2rem;
         }
 
+        /* Search bar */
         .hero-search {
           display: flex; align-items: center;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(114,9,183,0.35);
+          background: #ffffff;
+          border: 1.5px solid rgba(114,9,183,0.2);
           border-radius: 14px;
+          max-width: 500px;
           overflow: hidden;
-          max-width: 520px;
-          transition: border-color 0.25s, box-shadow 0.25s;
+          box-shadow: 0 4px 20px rgba(114,9,183,0.08);
+          transition: border-color 0.22s, box-shadow 0.22s;
         }
         .hero-search:focus-within {
           border-color: #7209b7;
-          box-shadow: 0 0 0 3px rgba(114,9,183,0.18), 0 8px 32px rgba(114,9,183,0.2);
+          box-shadow: 0 0 0 3px rgba(114,9,183,0.1), 0 6px 24px rgba(114,9,183,0.12);
         }
         .hero-search-icon {
-          padding: 0 1rem 0 1.1rem; color: rgba(240,232,255,0.3);
+          padding: 0 0.85rem 0 1.1rem;
+          color: #b084d8;
           flex-shrink: 0;
+          display: flex; align-items: center;
         }
         .hero-input {
-          flex: 1; background: none; border: none; outline: none;
-          color: #f0e8ff; font-family: 'Outfit', sans-serif;
-          font-size: 0.95rem; font-weight: 400;
-          padding: 0.95rem 0.5rem 0.95rem 0;
-        }
-        .hero-input::placeholder { color: rgba(240,232,255,0.3); }
-        .hero-search-btn {
-          margin: 6px; background: #7209b7; color: #fff;
-          border: none; border-radius: 10px;
-          padding: 0.65rem 1.3rem;
+          flex: 1; border: none; outline: none; background: none;
           font-family: 'Outfit', sans-serif;
-          font-size: 0.88rem; font-weight: 600;
-          cursor: pointer; display: flex; align-items: center; gap: 6px;
-          transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
-          box-shadow: 0 4px 16px rgba(114,9,183,0.4);
+          font-size: 0.95rem; font-weight: 400;
+          color: #18003a;
+          padding: 0.9rem 0.5rem 0.9rem 0;
+        }
+        .hero-input::placeholder { color: #b0b8c9; }
+        .hero-search-btn {
+          flex-shrink: 0;
+          margin: 5px;
+          background: #7209b7;
+          color: #fff; border: none; border-radius: 10px;
+          padding: 0.65rem 1.2rem;
+          font-family: 'Outfit', sans-serif;
+          font-size: 0.875rem; font-weight: 600;
+          cursor: pointer;
+          display: flex; align-items: center; gap: 6px;
+          transition: all 0.2s;
+          box-shadow: 0 3px 12px rgba(114,9,183,0.3);
+          white-space: nowrap;
         }
         .hero-search-btn:hover {
-          background: #9b2dca;
-          box-shadow: 0 6px 24px rgba(114,9,183,0.6);
+          background: #5c0799;
           transform: translateY(-1px);
+          box-shadow: 0 5px 18px rgba(114,9,183,0.42);
         }
 
-        .hero-popular {
-          margin-top: 1.25rem;
-          display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
-        }
-        .hero-popular-label {
-          color: rgba(240,232,255,0.35); font-size: 0.78rem; font-weight: 500;
-          letter-spacing: 0.04em; text-transform: uppercase;
-        }
+        /* Popular chips */
+        .hero-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; margin-top: 1.1rem; }
+        .hero-chip-label { color: #9ca3af; font-size: 0.77rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
         .hero-chip {
-          padding: 0.3rem 0.85rem; border-radius: 999px;
-          border: 1px solid rgba(114,9,183,0.25);
-          background: rgba(114,9,183,0.06);
-          color: rgba(240,232,255,0.6); font-size: 0.78rem;
-          cursor: pointer; transition: all 0.2s;
-          font-family: 'Outfit', sans-serif;
+          background: #fff; border: 1px solid rgba(114,9,183,0.18);
+          border-radius: 999px; padding: 0.28rem 0.85rem;
+          color: #7209b7; font-size: 0.78rem; font-weight: 500;
+          cursor: pointer; font-family: 'Outfit', sans-serif;
+          transition: all 0.18s;
         }
-        .hero-chip:hover {
-          border-color: #7209b7; color: #c77dff;
-          background: rgba(114,9,183,0.14);
-        }
+        .hero-chip:hover { background: rgba(114,9,183,0.06); border-color: #7209b7; }
 
-        .hero-stats {
-          display: flex; gap: 1.5rem; margin-top: 2.5rem; flex-wrap: wrap;
-        }
-        .hero-stat {
-          display: flex; align-items: center; gap: 10px;
-        }
+        /* Stats */
+        .hero-stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2.5rem; }
+        .hero-stat { display: flex; align-items: center; gap: 10px; }
         .hero-stat-icon {
-          width: 38px; height: 38px; border-radius: 10px;
-          background: rgba(114,9,183,0.14);
-          border: 1px solid rgba(114,9,183,0.22);
-          display: flex; align-items: center; justify-content: center;
-          color: #9b2dca;
+          width: 40px; height: 40px; border-radius: 11px;
+          background: rgba(114,9,183,0.08); border: 1px solid rgba(114,9,183,0.15);
+          display: flex; align-items: center; justify-content: center; color: #7209b7;
         }
         .hero-stat-val {
           font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 1.1rem; font-weight: 800;
-          color: #f0e8ff; letter-spacing: -0.02em;
+          font-size: 1.1rem; font-weight: 800; color: #18003a; letter-spacing: -0.02em;
         }
-        .hero-stat-lbl {
-          font-size: 0.75rem; color: rgba(240,232,255,0.4); font-weight: 400;
-        }
+        .hero-stat-lbl { font-size: 0.74rem; color: #9ca3af; font-weight: 400; }
 
-        /* Right side visual */
-        .hero-right {
-          position: relative; display: flex; align-items: center; justify-content: center;
+        /* Right side floating cards */
+        .hero-card {
+          background: #ffffff;
+          border: 1px solid rgba(114,9,183,0.12);
+          border-radius: 18px;
+          padding: 1.3rem 1.4rem;
+          box-shadow: 0 8px 32px rgba(114,9,183,0.1), 0 2px 8px rgba(0,0,0,0.04);
         }
-        .hero-card-float {
-          background: rgba(17,0,32,0.8);
-          border: 1px solid rgba(114,9,183,0.25);
-          border-radius: 16px;
-          padding: 1.25rem 1.5rem;
-          backdrop-filter: blur(12px);
-          width: 260px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(114,9,183,0.1);
+        .hero-card.hc-main { animation: hcFloat 6s ease-in-out infinite; }
+        .hero-card.hc-top {
+          position: absolute; top: -20px; right: -10px; width: 210px;
+          animation: hcFloat2 7s ease-in-out infinite;
         }
-        .hero-card-float.main {
-          width: 300px;
-          animation: floatMain 6s ease-in-out infinite;
+        .hero-card.hc-bot {
+          position: absolute; bottom: -10px; left: -20px; width: 200px;
+          animation: hcFloat3 8s ease-in-out infinite;
         }
-        .hero-card-float.side1 {
-          position: absolute; top: -20px; right: -20px;
-          width: 220px;
-          animation: floatSide1 8s ease-in-out infinite;
-        }
-        .hero-card-float.side2 {
-          position: absolute; bottom: -10px; left: -30px;
-          width: 200px;
-          animation: floatSide2 7s ease-in-out infinite;
-        }
-        @keyframes floatMain { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-        @keyframes floatSide1 { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-8px) rotate(-2deg)} }
-        @keyframes floatSide2 { 0%,100%{transform:translateY(0) rotate(1.5deg)} 50%{transform:translateY(-10px) rotate(1.5deg)} }
+        @keyframes hcFloat  { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-10px)} }
+        @keyframes hcFloat2 { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-8px) rotate(-2deg)} }
+        @keyframes hcFloat3 { 0%,100%{transform:translateY(0) rotate(1.5deg)} 50%{transform:translateY(-10px) rotate(1.5deg)} }
 
-        .hcf-co {
-          display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-        }
-        .hcf-logo {
-          width: 36px; height: 36px; border-radius: 8px;
-          background: linear-gradient(135deg, #7209b7, #9b2dca);
+        .hc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .hc-logo {
+          width: 38px; height: 38px; border-radius: 10px;
+          background: linear-gradient(135deg, #7209b7, #b44bf7);
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.75rem; font-weight: 700; color: #fff;
-          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 0.75rem; font-weight: 800; color: #fff;
+          font-family: 'Plus Jakarta Sans', sans-serif; flex-shrink: 0;
         }
-        .hcf-name { color: #f0e8ff; font-size: 0.9rem; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .hcf-loc { color: rgba(240,232,255,0.35); font-size: 0.72rem; }
-        .hcf-title { color: #f0e8ff; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .hcf-desc { color: rgba(240,232,255,0.45); font-size: 0.75rem; line-height: 1.5; margin-bottom: 0.85rem; }
-        .hcf-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
-        .hcf-tag {
+        .hc-co { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem; font-weight: 700; color: #18003a; }
+        .hc-loc { font-size: 0.72rem; color: #9ca3af; }
+        .hc-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; font-weight: 800; color: #18003a; margin-bottom: 6px; }
+        .hc-desc { font-size: 0.75rem; color: #6b7280; line-height: 1.55; margin-bottom: 10px; }
+        .hc-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+        .hc-tag {
           padding: 0.2rem 0.6rem; border-radius: 6px;
-          background: rgba(114,9,183,0.15); border: 1px solid rgba(114,9,183,0.2);
-          color: #c77dff; font-size: 0.7rem; font-weight: 500; font-family: 'Outfit', sans-serif;
+          background: rgba(114,9,183,0.07); border: 1px solid rgba(114,9,183,0.15);
+          color: #7209b7; font-size: 0.7rem; font-weight: 500; font-family: 'Outfit', sans-serif;
         }
-        .hcf-apply {
-          width: 100%; padding: 0.55rem; border-radius: 8px;
+        .hc-apply {
+          width: 100%; padding: 0.55rem; border-radius: 9px;
           background: #7209b7; color: #fff; border: none;
-          font-size: 0.8rem; font-weight: 600; cursor: pointer;
-          font-family: 'Outfit', sans-serif;
-          transition: background 0.2s;
+          font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 600;
+          cursor: pointer; transition: background 0.18s;
         }
-        .hcf-apply:hover { background: #9b2dca; }
-        .hcf-badge {
+        .hc-apply:hover { background: #5c0799; }
+        .hc-live {
           display: inline-flex; align-items: center; gap: 5px;
-          padding: 0.3rem 0.7rem; border-radius: 8px;
-          background: rgba(56,232,120,0.1); border: 1px solid rgba(56,232,120,0.2);
-          color: #4ade80; font-size: 0.72rem; font-weight: 600;
+          padding: 0.28rem 0.7rem; border-radius: 7px;
+          background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18);
+          color: #16a34a; font-size: 0.72rem; font-weight: 600; font-family: 'Outfit', sans-serif;
         }
-        .hcf-badge-dot {
-          width: 6px; height: 6px; border-radius: 50%; background: #4ade80;
-          animation: pulseDot 2s infinite;
-        }
+        .hc-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: hbPulse 2s infinite; }
+        .hc-small-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem; font-weight: 700; color: #18003a; margin: 8px 0 3px; }
+        .hc-small-sub { font-size: 0.73rem; color: #9ca3af; }
       `}</style>
 
-      <section className="hero-root">
-        <div className="hero-hex-pattern" />
-        <div className="hero-glow-1" />
-        <div className="hero-glow-2" />
-        <div className="hero-glow-3" />
+      <section className="hero-wrap">
+        <div className="hero-dots" />
         <canvas ref={canvasRef} className="hero-canvas" />
+        <div className="hero-blob1" />
+        <div className="hero-blob2" />
 
-        <div className="hero-content">
-          {/* LEFT */}
+        <div className="hero-inner">
+          {/* ── LEFT ── */}
           <div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
               <div className="hero-badge">
                 <span className="hero-badge-dot" />
-                No. 1 Job Hunt Platform in India
+                No. 1 Job Hunt Platform
               </div>
             </motion.div>
 
-            <motion.h1
-              className="hero-title"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.1 }}
+            <motion.h1 className="hero-h1"
+              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.08 }}
             >
-              Find Your Next
-              <br />
-              <span className="hero-title-accent">Dream Career</span>
-              <br />
+              Find Your Next<br />
+              <span className="hero-h1-grad">Dream Career</span><br />
               Opportunity
             </motion.h1>
 
-            <motion.p
-              className="hero-sub"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+            <motion.p className="hero-sub"
+              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 }}
             >
               Connect with top companies, discover roles that match your skills,
-              and take the leap toward a career you love — all in one place.
+              and take the next step toward a career you truly love.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.22 }}>
               <div className="hero-search">
-                <span className="hero-search-icon">
-                  <Search size={18} />
-                </span>
+                <span className="hero-search-icon"><Search size={17} /></span>
                 <input
                   type="text"
                   className="hero-input"
                   placeholder="Job title, skill or company…"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={handleKey}
+                  onKeyDown={(e) => e.key === "Enter" && search()}
                 />
-                <button className="hero-search-btn" onClick={searchJobHandler}>
+                <button className="hero-search-btn" onClick={search}>
                   Search <ArrowRight size={15} />
                 </button>
               </div>
 
-              <div className="hero-popular">
-                <span className="hero-popular-label">Trending:</span>
-                {POPULAR.map((tag) => (
-                  <button
-                    key={tag}
-                    className="hero-chip"
-                    onClick={() => {
-                      setQuery(tag);
-                      dispatch(setSearchedQuery(tag));
-                      navigate("/browse");
-                    }}
-                  >
-                    {tag}
+              <div className="hero-chips">
+                <span className="hero-chip-label">Trending:</span>
+                {CHIPS.map((c) => (
+                  <button key={c} className="hero-chip"
+                    onClick={() => { dispatch(setSearchedQuery(c)); navigate("/browse"); }}>
+                    {c}
                   </button>
                 ))}
               </div>
             </motion.div>
 
-            <motion.div
-              className="hero-stats"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.45 }}
+            <motion.div className="hero-stats"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
             >
               {STATS.map(({ icon: Icon, value, label }) => (
                 <div key={label} className="hero-stat">
-                  <div className="hero-stat-icon">
-                    <Icon size={16} />
-                  </div>
+                  <div className="hero-stat-icon"><Icon size={17} /></div>
                   <div>
                     <div className="hero-stat-val">{value}</div>
                     <div className="hero-stat-lbl">{label}</div>
@@ -463,56 +381,49 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* RIGHT — floating job cards */}
+          {/* ── RIGHT: floating cards ── */}
           <motion.div
-            className="hero-right"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
+            className="hero-right-col"
+            style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 420 }}
+            initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {/* Side card 1 */}
-            <div className="hero-card-float side1">
-              <div className="hcf-badge">
-                <span className="hcf-badge-dot" />
-                Now Hiring
-              </div>
-              <div style={{ marginTop: "0.75rem" }}>
-                <div className="hcf-title" style={{ fontSize: "0.85rem" }}>Product Designer</div>
-                <div className="hcf-loc">Remote · ₹18–24 LPA</div>
-              </div>
+            {/* Side card top */}
+            <div className="hero-card hc-top">
+              <div className="hc-live"><span className="hc-live-dot" /> Now Hiring</div>
+              <div className="hc-small-title">Product Designer</div>
+              <div className="hc-small-sub">Remote · ₹18–24 LPA</div>
             </div>
 
             {/* Main card */}
-            <div className="hero-card-float main">
-              <div className="hcf-co">
-                <div className="hcf-logo">JP</div>
+            <div className="hero-card hc-main" style={{ width: 290, position: "relative", zIndex: 1 }}>
+              <div className="hc-row">
+                <div className="hc-logo">TC</div>
                 <div>
-                  <div className="hcf-name">TechCorp India</div>
-                  <div className="hcf-loc">Bangalore · Full-time</div>
+                  <div className="hc-co">TechCorp India</div>
+                  <div className="hc-loc">Bangalore · Full-time</div>
                 </div>
               </div>
-              <div className="hcf-title">Senior React Developer</div>
-              <div className="hcf-desc">
-                Build cutting-edge web applications with a world-class engineering team.
+              <div className="hc-title">Senior React Developer</div>
+              <div className="hc-desc">Build cutting-edge web apps with a world-class engineering team.</div>
+              <div className="hc-tags">
+                <span className="hc-tag">React</span>
+                <span className="hc-tag">Node.js</span>
+                <span className="hc-tag">TypeScript</span>
               </div>
-              <div className="hcf-tags">
-                <span className="hcf-tag">React</span>
-                <span className="hcf-tag">Node.js</span>
-                <span className="hcf-tag">TypeScript</span>
-              </div>
-              <button className="hcf-apply">Quick Apply →</button>
+              <button className="hc-apply">Quick Apply →</button>
             </div>
 
-            {/* Side card 2 */}
-            <div className="hero-card-float side2">
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                <div style={{ width: 28, height: 28, borderRadius: 6, background: "rgba(247,37,133,0.15)", border: "1px solid rgba(247,37,133,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <TrendingUp size={12} color="#f72585" />
+            {/* Side card bottom */}
+            <div className="hero-card hc-bot">
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
+                <div style={{ width: 26, height: 26, borderRadius: 7, background: "rgba(114,9,183,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <TrendingUp size={12} color="#7209b7" />
                 </div>
-                <span style={{ color: "rgba(240,232,255,0.5)", fontSize: "0.72rem" }}>Trending Role</span>
+                <span style={{ fontSize: "0.7rem", color: "#9ca3af", fontFamily: "'Outfit',sans-serif" }}>Trending Role</span>
               </div>
-              <div className="hcf-title" style={{ fontSize: "0.82rem", marginBottom: "4px" }}>Data Scientist</div>
-              <div className="hcf-loc">₹22–32 LPA · Mumbai</div>
+              <div className="hc-small-title">Data Scientist</div>
+              <div className="hc-small-sub">₹22–32 LPA · Mumbai</div>
             </div>
           </motion.div>
         </div>

@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
+const NAV_H = 66; // must match Navbar height
+
 const Home = () => {
   useGetAllJobs();
   const { user } = useSelector((store) => store.auth);
@@ -17,16 +19,15 @@ const Home = () => {
 
   /* Redirect recruiter */
   useEffect(() => {
-    if (user?.role === "Recruiter") {
-      navigate("/admin/companies");
-    }
+    if (user?.role === "Recruiter") navigate("/admin/companies");
   }, [user, navigate]);
 
-  /* Scroll to About when coming via navbar link */
+  /* Scroll to About when arriving via navbar "About" click */
   useEffect(() => {
     if (location.state?.scrollTo === "about") {
-      const el = document.getElementById("about");
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => {
+        document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     }
   }, [location]);
 
@@ -34,17 +35,19 @@ const Home = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        background: "#07000f",
-      }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#f9f5ff" }}
     >
+      {/* Fixed Navbar */}
       <Navbar />
 
-      <main style={{ flex: 1 }}>
+      {/*
+        ─── CRITICAL FIX ───────────────────────────────────────────────
+        paddingTop pushes all page content below the fixed navbar.
+        Without this the first section slides under the navbar.
+        ────────────────────────────────────────────────────────────────
+      */}
+      <main style={{ flex: 1, paddingTop: NAV_H }}>
         <HeroSection />
         <About />
         <LatestJobs />
