@@ -9,7 +9,7 @@ import axios from "axios";
 import { USER_API_END_POINT } from '@/utils/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { setloading, setUser } from '@/redux/authSlice';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail, Lock, ChevronDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -19,12 +19,7 @@ import {
 } from '../ui/select';
 
 const Login = () => {
-  const [input, setInput] = useState({
-    email: "",
-    password: "",
-    role: "",
-  });
-
+  const [input, setInput] = useState({ email: "", password: "", role: "" });
   const { loading, user } = useSelector(store => store.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -35,15 +30,12 @@ const Login = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
     try {
       dispatch(setloading(true));
-
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true
       });
-
       if (res.data.success) {
         toast.success(res.data.message);
         dispatch(setUser(res.data.user));
@@ -56,91 +48,227 @@ const Login = () => {
     }
   };
 
-  useEffect(() =>{
-    if (user){
-      navigate("/"); 
-    }
-  },[]);
+  useEffect(() => {
+    if (user) navigate("/");
+  }, []);
 
   return (
-    <div>
-      <Navbar />
-      <div className="flex items-center justify-center mx-auto p-4 sm:p-6">
-        <form
-          onSubmit={submitHandler}
-          className="w-full max-w-sm sm:max-w-md md:max-w-lg border border-gray-200 rounded-md p-4 sm:p-6 my-6 sm:my-10"
-        >
-          <h1 className="font-bold text-lg sm:text-xl mb-4 sm:mb-5 text-center">
-            Login
-          </h1>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&family=Outfit:wght@400;500;600&display=swap');
 
-          {/* Email */}
-          <div className="my-2">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              name="email"
-              value={input.email}
-              onChange={changeEventHandler}
-              placeholder="Enter your email"
-              className="border border-gray-300 rounded-md px-3 py-2 w-full focus:border-blue-500"
-            />
+        .auth-page {
+          min-height: 100vh;
+          background: #f9f5ff;
+          font-family: 'Outfit', sans-serif;
+          position: relative;
+          overflow: hidden;
+        }
+        .auth-dots {
+          position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+          background-image: radial-gradient(circle, rgba(114,9,183,0.18) 1px, transparent 1px);
+          background-size: 28px 28px;
+          z-index: 0;
+        }
+        .auth-blob1 {
+          position: absolute; top: -100px; right: -80px;
+          width: 420px; height: 420px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(114,9,183,0.09) 0%, transparent 70%);
+          pointer-events: none; z-index: 0;
+        }
+        .auth-blob2 {
+          position: absolute; bottom: -80px; left: -60px;
+          width: 340px; height: 340px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(114,9,183,0.06) 0%, transparent 70%);
+          pointer-events: none; z-index: 0;
+        }
+        .auth-center {
+          position: relative; z-index: 1;
+          display: flex; align-items: center; justify-content: center;
+          min-height: calc(100vh - 66px);
+          padding: 2rem 1rem;
+        }
+        .auth-card {
+          background: #ffffff;
+          border: 1px solid rgba(114,9,183,0.14);
+          border-radius: 20px;
+          padding: 2.2rem 2rem;
+          width: 100%; max-width: 420px;
+          box-shadow: 0 12px 40px rgba(114,9,183,0.1), 0 2px 8px rgba(0,0,0,0.04);
+          position: relative;
+        }
+        .auth-card::before {
+          content: '';
+          position: absolute; top: 0; left: 0; right: 0; height: 3px;
+          background: linear-gradient(90deg, #7209b7, #b44bf7);
+          border-radius: 20px 20px 0 0;
+        }
+        .auth-title {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 1.65rem; font-weight: 900;
+          color: #18003a;
+          letter-spacing: -0.03em;
+          margin-bottom: 0.3rem;
+          text-align: center;
+        }
+        .auth-subtitle {
+          font-size: 0.84rem; color: #9ca3af;
+          text-align: center; margin-bottom: 1.8rem;
+        }
+        .auth-field { margin-bottom: 1.1rem; }
+        .auth-label {
+          display: block;
+          font-size: 0.8rem; font-weight: 600;
+          color: #4b006e; margin-bottom: 0.4rem;
+          font-family: 'Outfit', sans-serif;
+        }
+        .auth-input-wrap { position: relative; }
+        .auth-input-icon {
+          position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+          color: #b084d8; pointer-events: none;
+          display: flex; align-items: center;
+        }
+        .auth-input {
+          width: 100%;
+          padding: 0.65rem 0.9rem 0.65rem 2.3rem;
+          border: 1.5px solid rgba(114,9,183,0.18);
+          border-radius: 10px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 0.9rem; color: #18003a;
+          background: #fdfaff;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+          box-sizing: border-box;
+        }
+        .auth-input::placeholder { color: #c4b5d4; }
+        .auth-input:focus {
+          border-color: #7209b7;
+          box-shadow: 0 0 0 3px rgba(114,9,183,0.1);
+          background: #fff;
+        }
+        .auth-select-wrap .auth-select-trigger {
+          width: 100%;
+          padding: 0.65rem 0.9rem;
+          border: 1.5px solid rgba(114,9,183,0.18);
+          border-radius: 10px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 0.9rem; color: #18003a;
+          background: #fdfaff;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .auth-select-wrap .auth-select-trigger:focus-within {
+          border-color: #7209b7;
+          box-shadow: 0 0 0 3px rgba(114,9,183,0.1);
+        }
+        .auth-btn {
+          width: 100%;
+          margin-top: 1.4rem;
+          padding: 0.72rem;
+          border-radius: 10px;
+          background: #7209b7;
+          color: #fff;
+          font-family: 'Outfit', sans-serif;
+          font-size: 0.95rem; font-weight: 600;
+          border: none; cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 4px 14px rgba(114,9,183,0.3);
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .auth-btn:hover { background: #5c0799; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(114,9,183,0.4); }
+        .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .auth-footer {
+          margin-top: 1.3rem;
+          text-align: center;
+          font-size: 0.84rem; color: #6b7280;
+        }
+        .auth-link { color: #7209b7; font-weight: 600; text-decoration: none; }
+        .auth-link:hover { text-decoration: underline; }
+        .auth-divider {
+          display: flex; align-items: center; gap: 10px;
+          margin: 1.4rem 0 1rem;
+        }
+        .auth-divider-line { flex: 1; height: 1px; background: rgba(114,9,183,0.1); }
+        .auth-divider-text { font-size: 0.74rem; color: #c4b5d4; font-weight: 500; }
+      `}</style>
+
+      <div className="auth-page">
+        <Navbar />
+        <div className="auth-dots" />
+        <div className="auth-blob1" />
+        <div className="auth-blob2" />
+
+        <div className="auth-center">
+          <div className="auth-card">
+            <div className="auth-title">Welcome back</div>
+            <div className="auth-subtitle">Login to your account to continue</div>
+
+            <form onSubmit={submitHandler}>
+              {/* Email */}
+              <div className="auth-field">
+                <label className="auth-label">Email</label>
+                <div className="auth-input-wrap">
+                  <span className="auth-input-icon"><Mail size={14} /></span>
+                  <input
+                    className="auth-input"
+                    type="email"
+                    name="email"
+                    value={input.email}
+                    onChange={changeEventHandler}
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="auth-field">
+                <label className="auth-label">Password</label>
+                <div className="auth-input-wrap">
+                  <span className="auth-input-icon"><Lock size={14} /></span>
+                  <input
+                    className="auth-input"
+                    type="password"
+                    name="password"
+                    value={input.password}
+                    onChange={changeEventHandler}
+                    placeholder="Enter your password"
+                  />
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="auth-field">
+                <label className="auth-label">Role</label>
+                <div className="auth-select-wrap">
+                  <Select onValueChange={(value) => setInput({ ...input, role: value })}>
+                    <SelectTrigger className="auth-select-trigger mt-0 bg-[#fdfaff] border-[1.5px] border-purple-200 rounded-[10px] font-[Outfit] text-[0.9rem] text-[#18003a] focus:border-[#7209b7] focus:ring-[rgba(114,9,183,0.1)]">
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-purple-100 shadow-lg rounded-xl">
+                      <SelectItem value="job-seeker">Job Seeker</SelectItem>
+                      <SelectItem value="Recruiter">Recruiter</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <button className="auth-btn" type="submit" disabled={loading}>
+                {loading ? (
+                  <><Loader2 className="animate-spin" size={16} /> Please wait</>
+                ) : "Login"}
+              </button>
+            </form>
+
+            <div className="auth-footer">
+              Don't have an account?{" "}
+              {/* ✅ Fixed typo: was /singup */}
+              <Link to="/signup" className="auth-link">Sign up</Link>
+            </div>
           </div>
-
-          {/* Password */}
-          <div className="my-2">
-            <Label>Password</Label>
-            <Input
-              type="password"
-              name="password"
-              value={input.password}
-              onChange={changeEventHandler}
-              placeholder="Enter your password"
-              className="border border-gray-300 rounded-md px-3 py-2 w-full focus:border-blue-500"
-            />
-          </div>
-
-          {/* ✅ Role Dropdown */}
-          <div className="my-4">
-            <Label>Role</Label>
-            <Select onValueChange={(value) => setInput({ ...input, role: value })}>
-              <SelectTrigger className="mt-1 bg-white border border-gray-300 rounded-md">
-                <SelectValue placeholder="Select your role" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                <SelectItem value="job-seeker">Job Seeker</SelectItem>
-                <SelectItem value="Recruiter">Recruiter</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Loader and Button */}
-          {loading ? (
-            <Button className="w-full my-4 py-2">
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Please wait
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              className="w-full my-4 py-2 text-white bg-black active:bg-gray-800"
-            >
-              Login
-            </Button>
-          )}
-
-          {/* Signup Link */}
-          <span className="text-xs sm:text-sm block text-center">
-            Don't have an account?{" "}
-            <Link to="/singup" className="text-blue-600">
-              Signup
-            </Link>
-          </span>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
 export default Login;
-

@@ -1,15 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, ArrowRight, Briefcase, Users, TrendingUp } from "lucide-react";
+import { Search, ArrowRight, TrendingUp } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
-const STATS = [
-  { icon: Briefcase, value: "50K+", label: "Live Jobs" },
-  { icon: Users,    value: "12K+", label: "Companies" },
-  { icon: TrendingUp, value: "2M+", label: "Job Seekers" },
-];
 
 const CHIPS = ["UI/UX Designer", "React Developer", "Data Analyst", "Product Manager"];
 
@@ -24,7 +18,6 @@ const HeroSection = () => {
     navigate("/browse");
   };
 
-  /* ── Subtle animated network on light bg ── */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -90,7 +83,6 @@ const HeroSection = () => {
           display: flex; align-items: center;
           font-family: 'Outfit', sans-serif;
         }
-        /* large faint circle decorations */
         .hero-blob1 {
           position: absolute; top: -120px; right: -100px;
           width: 500px; height: 500px; border-radius: 50%;
@@ -103,7 +95,6 @@ const HeroSection = () => {
           background: radial-gradient(circle, rgba(114,9,183,0.06) 0%, transparent 70%);
           pointer-events: none;
         }
-        /* dot-grid pattern */
         .hero-dots {
           position: absolute; inset: 0; pointer-events: none; opacity: 0.55;
           background-image: radial-gradient(circle, rgba(114,9,183,0.18) 1px, transparent 1px);
@@ -114,7 +105,6 @@ const HeroSection = () => {
           width: 100%; height: 100%;
           pointer-events: none;
         }
-
         .hero-inner {
           position: relative; z-index: 2;
           max-width: 1280px; margin: 0 auto;
@@ -129,8 +119,6 @@ const HeroSection = () => {
           .hero-inner { grid-template-columns: 1fr; }
           .hero-right-col { display: none; }
         }
-
-        /* Badge */
         .hero-badge {
           display: inline-flex; align-items: center; gap: 8px;
           background: rgba(114,9,183,0.08);
@@ -147,8 +135,6 @@ const HeroSection = () => {
           animation: hbPulse 2s ease-in-out infinite;
         }
         @keyframes hbPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.65)} }
-
-        /* Heading */
         .hero-h1 {
           font-family: 'Plus Jakarta Sans', sans-serif;
           font-size: clamp(2.2rem, 4.5vw, 3.6rem);
@@ -163,8 +149,6 @@ const HeroSection = () => {
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-
-        /* Sub */
         .hero-sub {
           color: #6b7280;
           font-size: 1.05rem;
@@ -172,8 +156,6 @@ const HeroSection = () => {
           max-width: 460px;
           margin-bottom: 2rem;
         }
-
-        /* Search bar */
         .hero-search {
           display: flex; align-items: center;
           background: #ffffff;
@@ -221,8 +203,6 @@ const HeroSection = () => {
           transform: translateY(-1px);
           box-shadow: 0 5px 18px rgba(114,9,183,0.42);
         }
-
-        /* Popular chips */
         .hero-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; margin-top: 1.1rem; }
         .hero-chip-label { color: #9ca3af; font-size: 0.77rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
         .hero-chip {
@@ -233,22 +213,6 @@ const HeroSection = () => {
           transition: all 0.18s;
         }
         .hero-chip:hover { background: rgba(114,9,183,0.06); border-color: #7209b7; }
-
-        /* Stats */
-        .hero-stats { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2.5rem; }
-        .hero-stat { display: flex; align-items: center; gap: 10px; }
-        .hero-stat-icon {
-          width: 40px; height: 40px; border-radius: 11px;
-          background: rgba(114,9,183,0.08); border: 1px solid rgba(114,9,183,0.15);
-          display: flex; align-items: center; justify-content: center; color: #7209b7;
-        }
-        .hero-stat-val {
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: 1.1rem; font-weight: 800; color: #18003a; letter-spacing: -0.02em;
-        }
-        .hero-stat-lbl { font-size: 0.74rem; color: #9ca3af; font-weight: 400; }
-
-        /* Right side floating cards */
         .hero-card {
           background: #ffffff;
           border: 1px solid rgba(114,9,183,0.12);
@@ -268,7 +232,6 @@ const HeroSection = () => {
         @keyframes hcFloat  { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-10px)} }
         @keyframes hcFloat2 { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-8px) rotate(-2deg)} }
         @keyframes hcFloat3 { 0%,100%{transform:translateY(0) rotate(1.5deg)} 50%{transform:translateY(-10px) rotate(1.5deg)} }
-
         .hc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .hc-logo {
           width: 38px; height: 38px; border-radius: 10px;
@@ -364,21 +327,6 @@ const HeroSection = () => {
                 ))}
               </div>
             </motion.div>
-
-            <motion.div className="hero-stats"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.35 }}
-            >
-              {STATS.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="hero-stat">
-                  <div className="hero-stat-icon"><Icon size={17} /></div>
-                  <div>
-                    <div className="hero-stat-val">{value}</div>
-                    <div className="hero-stat-lbl">{label}</div>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
           </div>
 
           {/* ── RIGHT: floating cards ── */}
@@ -388,14 +336,12 @@ const HeroSection = () => {
             initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {/* Side card top */}
             <div className="hero-card hc-top">
               <div className="hc-live"><span className="hc-live-dot" /> Now Hiring</div>
               <div className="hc-small-title">Product Designer</div>
               <div className="hc-small-sub">Remote · ₹18–24 LPA</div>
             </div>
 
-            {/* Main card */}
             <div className="hero-card hc-main" style={{ width: 290, position: "relative", zIndex: 1 }}>
               <div className="hc-row">
                 <div className="hc-logo">TC</div>
@@ -414,7 +360,6 @@ const HeroSection = () => {
               <button className="hc-apply">Quick Apply →</button>
             </div>
 
-            {/* Side card bottom */}
             <div className="hero-card hc-bot">
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
                 <div style={{ width: 26, height: 26, borderRadius: 7, background: "rgba(114,9,183,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
