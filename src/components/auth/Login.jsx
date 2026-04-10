@@ -132,7 +132,7 @@ const Login = () => {
           {/* Signup Link */}
           <span className="text-xs sm:text-sm block text-center">
             Don't have an account?{" "}
-            <Link to="/Singup" className="text-blue-600">
+            <Link to="/singup" className="text-blue-600">
               Signup
             </Link>
           </span>
