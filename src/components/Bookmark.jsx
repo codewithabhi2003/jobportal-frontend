@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import React from "react";
 import Navbar from "./shared/Navbar";
 import Job from "./Job";
