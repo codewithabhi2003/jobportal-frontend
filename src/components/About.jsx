@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import React from "react";
 import { Briefcase, Users, Rocket, Search, ShieldCheck, TrendingUp } from "lucide-react";
 
