@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import React from "react";
 import { Briefcase, Users, Rocket, Search, ShieldCheck, TrendingUp } from "lucide-react";
 

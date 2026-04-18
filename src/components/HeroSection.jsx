@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import React, { useState, useEffect, useRef } from "react";
 import { Search, ArrowRight, TrendingUp } from "lucide-react";
 import { useDispatch } from "react-redux";
