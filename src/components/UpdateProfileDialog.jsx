@@ -61,11 +61,11 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
   }
 
   const fields = [
-    { id: "fullname", label: "Full Name",    icon: User,      type: "text",  placeholder: "John Doe" },
-    { id: "email",    label: "Email",        icon: Mail,      type: "email", placeholder: "you@example.com" },
-    { id: "phoneNumber", label: "Phone",     icon: Phone,     type: "text",  placeholder: "+91 98765 43210" },
-    { id: "bio",      label: "Bio",          icon: AlignLeft, type: "text",  placeholder: "A short bio about you" },
-    { id: "skills",   label: "Skills",       icon: Star,      type: "text",  placeholder: "React, Node.js, Python" },
+    { id: "fullname",    label: "Full Name", Icon: User,      type: "text",  placeholder: "John Doe" },
+    { id: "email",       label: "Email",     Icon: Mail,      type: "email", placeholder: "you@example.com" },
+    { id: "phoneNumber", label: "Phone",     Icon: Phone,     type: "text",  placeholder: "+91 98765 43210" },
+    { id: "bio",         label: "Bio",       Icon: AlignLeft, type: "text",  placeholder: "A short bio about you" },
+    { id: "skills",      label: "Skills",    Icon: Star,      type: "text",  placeholder: "React, Node.js, Python" },
   ]
 
   return (
@@ -188,13 +188,13 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             </div>
 
             <form onSubmit={submitHandler}>
-              {fields.map(({ id, label, icon: IconComponent, type, placeholder }) => (
+              {fields.map(({ id, label, Icon, type, placeholder }) => (
                 <div key={id} className="upd-field">
                   <label className="upd-label" htmlFor={id}>
-                    <IconComponent size={11} /> {label}
+                    <Icon size={11} /> {label}
                   </label>
                   <div className="upd-input-wrap">
-                    <span className="upd-input-icon"><IconComponent size={13} /></span>
+                    <span className="upd-input-icon"><Icon size={13} /></span>
                     <input
                       id={id} name={id} type={type}
                       value={input[id]}
