@@ -4,7 +4,7 @@ import Job from "./Job";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
-import { motion } from "framer-motion";
+
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 

@@ -188,13 +188,13 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             </div>
 
             <form onSubmit={submitHandler}>
-              {fields.map(({ id, label, icon: Icon, type, placeholder }) => (
+              {fields.map(({ id, label, icon: IconComponent, type, placeholder }) => (
                 <div key={id} className="upd-field">
                   <label className="upd-label" htmlFor={id}>
-                    <Icon size={11} /> {label}
+                    <IconComponent size={11} /> {label}
                   </label>
                   <div className="upd-input-wrap">
-                    <span className="upd-input-icon"><Icon size={13} /></span>
+                    <span className="upd-input-icon"><IconComponent size={13} /></span>
                     <input
                       id={id} name={id} type={type}
                       value={input[id]}

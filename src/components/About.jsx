@@ -1,6 +1,6 @@
 import React from "react";
 import { Briefcase, Users, Rocket, Search, ShieldCheck, TrendingUp } from "lucide-react";
-import { motion } from "framer-motion";
+
 
 const FEATURES = [
   { icon: Briefcase,   title: "Find the Right Job",    desc: "Browse curated listings tailored to your skills, interests, and long-term career goals." },

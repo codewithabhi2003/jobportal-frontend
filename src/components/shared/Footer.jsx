@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { GitHub, Twitter, Linkedin, Mail } from "lucide-react";
 
 const LINKS = {
   Product:   [{ label: "Find Jobs", to: "/jobs" }, { label: "Browse", to: "/browse" }, { label: "Bookmarks", to: "/bookmark" }],
@@ -8,10 +8,10 @@ const LINKS = {
   Recruiters:[{ label: "Post a Job", to: "/admin/jobs" }, { label: "Companies", to: "/admin/companies" }, { label: "Dashboard", to: "/admin" }],
 };
 const SOCIALS = [
-  { Icon: Github,   href: "#", label: "GitHub" },
-  { Icon: Twitter,  href: "#", label: "Twitter" },
+  { Icon: GitHub, href: "#", label: "GitHub" },
+  { Icon: Twitter, href: "#", label: "Twitter" },
   { Icon: Linkedin, href: "#", label: "LinkedIn" },
-  { Icon: Mail,     href: "#", label: "Email" },
+  { Icon: Mail, href: "#", label: "Email" },
 ];
 
 const Footer = () => (

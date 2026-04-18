@@ -60,8 +60,9 @@ const UpdateJob = () => {
           });
         }
       } catch (error) {
-        toast.error("Failed to load job details");
-      }
+  console.log(error);
+  toast.error("Failed to load job details");
+}
     };
 
     fetchJob();

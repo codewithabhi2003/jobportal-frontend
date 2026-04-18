@@ -7,7 +7,7 @@ import Footer from "./shared/Footer";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+
 
 const NAV_H = 66; // must match Navbar height
 

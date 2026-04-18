@@ -3,7 +3,7 @@ import Navbar from "./shared/Navbar";
 import FilterCard from "./FilterCard";
 import Job from "./Job";
 import { useSelector } from "react-redux";
-import { motion } from "framer-motion";
+
 
 /* 🔹 Motion Variants (same as Bookmark) */
 const containerVariants = {

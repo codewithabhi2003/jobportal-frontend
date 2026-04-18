@@ -3,7 +3,7 @@ import { Search, ArrowRight, TrendingUp } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+
 
 const CHIPS = ["UI/UX Designer", "React Developer", "Data Analyst", "Product Manager"];
 

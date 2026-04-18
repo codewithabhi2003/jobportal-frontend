@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import LatestJobCards from "./LatestJobCards";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+
 
 const LatestJobs = () => {
   const { allJobs } = useSelector((store) => store.job);

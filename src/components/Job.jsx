@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage } from './ui/avatar';
 import { MapPin, Clock, IndianRupee, ArrowUpRight, Bookmark } from 'lucide-react';
-import { motion } from 'framer-motion';
+
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { setSavedJobs } from '@/redux/jobSlice';

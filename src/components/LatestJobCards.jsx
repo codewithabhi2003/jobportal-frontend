@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { MapPin, Clock, IndianRupee, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
+
 
 const LatestJobCards = ({ job, index }) => {
   const navigate = useNavigate();

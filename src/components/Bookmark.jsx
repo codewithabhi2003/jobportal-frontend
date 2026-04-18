@@ -3,7 +3,7 @@ import Navbar from "./shared/Navbar";
 import Job from "./Job";
 import { useSelector } from "react-redux";
 import useGetBookmarks from "@/hooks/useGetBookmarks";
-import { motion } from "framer-motion";
+
 
 /* 🔹 Motion Variants (same as Jobs & Bookmark style) */
 const containerVariants = {
