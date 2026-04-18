@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
+
 import React, { useEffect } from "react";
 import Navbar from "./shared/Navbar";
 import Job from "./Job";

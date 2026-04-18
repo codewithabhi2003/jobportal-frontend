@@ -1,11 +1,10 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
+
 import React, { useState, useEffect, useRef } from "react";
 import { Search, ArrowRight, TrendingUp } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
 import { useNavigate } from "react-router-dom";
-
-
 const CHIPS = ["UI/UX Designer", "React Developer", "Data Analyst", "Product Manager"];
 
 const HeroSection = () => {

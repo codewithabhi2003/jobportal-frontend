@@ -11,7 +11,10 @@ module.exports = {
   settings: { react: { version: 'detect' } },
   rules: {
     'react/prop-types': 'off',
-    'react/jsx-uses-vars': 'error',   // ← this is what marks motion as "used"
-    'no-unused-vars': ['warn', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
+    'react/jsx-uses-vars': 'error',
+    'no-unused-vars': ['warn', {
+      varsIgnorePattern: '^[A-Z_]|^motion$',
+      argsIgnorePattern: '^_'
+    }],
   },
 }

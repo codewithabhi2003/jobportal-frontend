@@ -1,4 +1,5 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
+
 import React, { useEffect } from "react";
 import Navbar from "./shared/Navbar";
 import HeroSection from "./HeroSection";
@@ -8,8 +9,6 @@ import Footer from "./shared/Footer";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-
-
 const NAV_H = 66; // must match Navbar height
 
 const Home = () => {

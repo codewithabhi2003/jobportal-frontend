@@ -1,11 +1,10 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
+
 import React, { useState, useEffect } from "react";
 import Navbar from "./shared/Navbar";
 import FilterCard from "./FilterCard";
 import Job from "./Job";
 import { useSelector } from "react-redux";
-
-
 /* 🔹 Motion Variants (same as Bookmark) */
 const containerVariants = {
   hidden: { opacity: 0 },
