@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-
 import React, { useEffect } from "react";
 import Navbar from "./shared/Navbar";
 import HeroSection from "./HeroSection";
@@ -9,6 +8,7 @@ import Footer from "./shared/Footer";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
+
 const NAV_H = 66; // must match Navbar height
 
 const Home = () => {
@@ -17,17 +17,18 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  /* Redirect recruiter */
+  /* Redirect recruiter — replace:true prevents back-button redirect loop */
   useEffect(() => {
-    if (user?.role === "Recruiter") navigate("/admin/companies");
+    if (user?.role === "Recruiter") navigate("/admin/companies", { replace: true });
   }, [user, navigate]);
 
   /* Scroll to About when arriving via navbar "About" click */
   useEffect(() => {
     if (location.state?.scrollTo === "about") {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
+      return () => clearTimeout(timer); // cleanup: prevent memory leak on unmount
     }
   }, [location]);
 
