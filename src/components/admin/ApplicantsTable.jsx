@@ -1,14 +1,16 @@
 import React from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { MoreHorizontal, CheckCircle, XCircle } from "lucide-react";
+import { MoreHorizontal, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios";
 import { APPLICATION_API_END_POINT } from "@/utils/constant";
+import { useNavigate } from "react-router-dom";
 
 const ApplicantsTable = () => {
   const { applicants } = useSelector((store) => store.application);
+  const navigate = useNavigate();
 
   const statusHandler = async (status, id) => {
     try {
@@ -140,9 +142,26 @@ const ApplicantsTable = () => {
                         </Avatar>
                       </div>
                     </td>
+
+                    {/* Clickable Name */}
                     <td className="apt-td">
-                      <span className="apt-name">{item?.applicant?.fullname || "N/A"}</span>
+                      <button
+                        style={{
+                          background: "none", border: "none", cursor: "pointer",
+                          display: "flex", alignItems: "center", gap: 5,
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          fontWeight: 700, color: "#7209b7", fontSize: "0.875rem",
+                          padding: 0, transition: "opacity 0.18s"
+                        }}
+                        onClick={() => navigate(`/profile/view/${item?.applicant?._id}`)}
+                        onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                      >
+                        {item?.applicant?.fullname || "N/A"}
+                        <ExternalLink size={12} />
+                      </button>
                     </td>
+
                     <td className="apt-td">
                       <span className="apt-email">{item?.applicant?.email || "N/A"}</span>
                     </td>

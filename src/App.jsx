@@ -16,6 +16,7 @@ import Applicants from './components/admin/Applicants'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import UpdateJob from './components/admin/UpdateJob'
 import Browse from './components/Browse'
+import PublicProfile from "./components/PublicProfile";
 
 
 
@@ -83,6 +84,10 @@ const appRouter = createBrowserRouter([
   {
     path:"/admin/jobs/:id/applicants",
     element:<ProtectedRoute><Applicants/></ProtectedRoute>
+  },
+  {
+    path: "/profile/view/:id",
+    element: <PublicProfile />
   },
   {
   path: "/admin/jobs/edit/:id",
