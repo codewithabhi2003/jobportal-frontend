@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./shared/Navbar";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import { Mail, Contact, Star, FileText, Briefcase, ArrowLeft, MapPin, Globe } from "lucide-react";
+import { Mail, Contact, Star, Briefcase, ArrowLeft, MapPin, Globe } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { useParams, useNavigate } from "react-router-dom";
@@ -11,6 +17,7 @@ const PublicProfile = () => {
   const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openPhoto, setOpenPhoto] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,7 +51,8 @@ const PublicProfile = () => {
         .pp-card { background: #fff; border: 1px solid rgba(114,9,183,0.13); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 36px rgba(114,9,183,0.09), 0 2px 8px rgba(0,0,0,0.04); position: relative; margin-bottom: 1.25rem; }
         .pp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #7209b7, #b44bf7); border-radius: 20px 20px 0 0; }
         .pp-top { display: flex; align-items: flex-start; gap: 1.25rem; flex-wrap: wrap; }
-        .pp-avatar { width: 76px; height: 76px; border-radius: 50%; border: 3px solid #7209b7; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 16px rgba(114,9,183,0.2); }
+        .pp-avatar { width: 76px; height: 76px; border-radius: 50%; border: 3px solid #7209b7; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 16px rgba(114,9,183,0.2); cursor: pointer; transition: opacity 0.2s; }
+        .pp-avatar:hover { opacity: 0.85; }
         .pp-role-badge { display: inline-flex; align-items: center; gap: 5px; padding: 0.22rem 0.75rem; border-radius: 999px; background: rgba(114,9,183,0.08); border: 1px solid rgba(114,9,183,0.18); color: #7209b7; font-size: 0.73rem; font-weight: 600; margin-bottom: 0.4rem; }
         .pp-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.3rem; font-weight: 800; color: #18003a; letter-spacing: -0.02em; margin-bottom: 3px; }
         .pp-bio { font-size: 0.85rem; color: #6b7280; line-height: 1.6; }
@@ -53,8 +61,6 @@ const PublicProfile = () => {
         .pp-contact-row { display: flex; align-items: center; gap: 10px; margin-bottom: 0.7rem; font-size: 0.88rem; color: #374151; }
         .pp-contact-icon { width: 32px; height: 32px; border-radius: 9px; background: rgba(114,9,183,0.07); border: 1px solid rgba(114,9,183,0.13); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #7209b7; }
         .pp-skill { display: inline-flex; align-items: center; gap: 5px; padding: 0.28rem 0.8rem; border-radius: 8px; background: rgba(114,9,183,0.07); border: 1px solid rgba(114,9,183,0.18); color: #7209b7; font-size: 0.78rem; font-weight: 600; }
-        .pp-resume-link { display: inline-flex; align-items: center; gap: 7px; padding: 0.42rem 1rem; border-radius: 9px; background: rgba(114,9,183,0.07); border: 1px solid rgba(114,9,183,0.18); color: #7209b7; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: all 0.18s; }
-        .pp-resume-link:hover { background: rgba(114,9,183,0.13); }
         .pp-no-data { font-size: 0.84rem; color: #9ca3af; }
         .pp-skeleton { background: linear-gradient(90deg, #f0ebff 25%, #e8e0ff 50%, #f0ebff 75%); background-size: 200% 100%; animation: ppShimmer 1.4s infinite; border-radius: 10px; }
         @keyframes ppShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
@@ -89,11 +95,14 @@ const PublicProfile = () => {
               {/* ── IDENTITY CARD ── */}
               <div className="pp-card">
                 <div className="pp-top">
-                  <div className="pp-avatar">
+
+                  {/* Clickable Avatar → opens enlarged photo dialog */}
+                  <div className="pp-avatar" onClick={() => setOpenPhoto(true)}>
                     <Avatar style={{ width: "100%", height: "100%", borderRadius: "50%" }}>
                       <AvatarImage src={profileUser?.profile?.profilePhoto} />
                     </Avatar>
                   </div>
+
                   <div style={{ paddingTop: 4 }}>
                     <div className="pp-role-badge">
                       {isRecruiter ? <><Briefcase size={11} /> Recruiter</> : <><Star size={11} /> Job Seeker</>}
@@ -118,11 +127,11 @@ const PublicProfile = () => {
                   </div>
                 </div>
 
-                {/* ── JOB SEEKER: Skills + Resume ── */}
+                {/* ── JOB SEEKER: Skills only (no resume) ── */}
                 {!isRecruiter && (
                   <>
                     <div className="pp-divider" />
-                    <div style={{ marginBottom: "1.3rem" }}>
+                    <div>
                       <div className="pp-section-title">Skills</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
                         {profileUser?.profile?.skills?.length > 0
@@ -133,21 +142,10 @@ const PublicProfile = () => {
                         }
                       </div>
                     </div>
-
-                    <div className="pp-divider" />
-                    <div>
-                      <div className="pp-section-title">Resume</div>
-                      {profileUser?.profile?.resume
-                        ? <a href={profileUser.profile.resume} target="_blank" rel="noopener noreferrer" className="pp-resume-link">
-                            <FileText size={14} /> View Resume
-                          </a>
-                        : <span className="pp-no-data">No resume uploaded</span>
-                      }
-                    </div>
                   </>
                 )}
 
-                {/* ── RECRUITER: Company info only ── */}
+                {/* ── RECRUITER: Company info ── */}
                 {isRecruiter && profileUser?.profile?.company && (
                   <>
                     <div className="pp-divider" />
@@ -166,8 +164,12 @@ const PublicProfile = () => {
                       {profileUser.profile.company.website && (
                         <div className="pp-contact-row">
                           <span className="pp-contact-icon"><Globe size={14} /></span>
-                          <a href={profileUser.profile.company.website} target="_blank" rel="noopener noreferrer"
-                            style={{ color: "#7209b7", textDecoration: "none", fontWeight: 600 }}>
+                          <a
+                            href={profileUser.profile.company.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "#7209b7", textDecoration: "none", fontWeight: 600 }}
+                          >
                             {profileUser.profile.company.website.replace(/https?:\/\//, "")}
                           </a>
                         </div>
@@ -176,6 +178,26 @@ const PublicProfile = () => {
                   </>
                 )}
               </div>
+
+              {/* ── Photo Enlarged Dialog ── */}
+              <Dialog open={openPhoto} onOpenChange={setOpenPhoto}>
+                <DialogContent className="bg-white rounded-2xl p-5 flex items-center justify-center shadow-2xl border border-purple-100">
+                  <DialogTitle className="sr-only">Profile Photo</DialogTitle>
+                  <DialogDescription className="sr-only">Enlarged profile photo</DialogDescription>
+                  <img
+                    src={profileUser?.profile?.profilePhoto || "https://via.placeholder.com/150"}
+                    alt="Profile"
+                    style={{
+                      width: 240,
+                      height: 300,
+                      objectFit: "cover",
+                      borderRadius: 14,
+                      border: "3px solid #7209b7",
+                      boxShadow: "0 8px 30px rgba(114,9,183,0.2)"
+                    }}
+                  />
+                </DialogContent>
+              </Dialog>
             </>
           )}
         </div>
