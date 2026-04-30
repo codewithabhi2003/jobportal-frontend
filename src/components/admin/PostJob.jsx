@@ -80,12 +80,17 @@ const PostJob = () => {
             <h1 className="pj-title">Post a New Job</h1>
             <form onSubmit={submitHandler}>
               <div className="pj-grid">
-                {FIELDS.map(({ name, label, icon: Icon, placeholder, type }) => (
-                  <div key={name}>
-                    <div className="pj-label"><Icon size={13} /> {label}</div>
-                    <input className="pj-input" type={type} name={name} value={input[name]} onChange={changeEventHandler} placeholder={placeholder} />
-                  </div>
-                ))}
+                {FIELDS.map(({ name, label, icon, placeholder, type }) => {
+  const Icon = icon;
+  return (
+    <div key={name}>
+      <div className="uj-label"><Icon size={13} /> {label}</div>
+      <input className="uj-input" type={type} name={name}
+        value={input[name]} onChange={changeEventHandler}
+        placeholder={placeholder} />
+    </div>
+  );
+})}
 
                 {companies.length > 0 && (
                   <div className="pj-full">
