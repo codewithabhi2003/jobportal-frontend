@@ -29,9 +29,9 @@ const CompanyCreate = () => {
         toast.success(res.data.message);
         navigate(`/admin/companies/${res.data.company?._id}`);
       }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-    }
+   } catch {
+  toast.error("Something went wrong. Please try again.");
+}
   };
 
   return (
