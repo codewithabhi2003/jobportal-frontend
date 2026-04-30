@@ -108,12 +108,17 @@ const UpdateJob = () => {
 
             <form onSubmit={submitHandler}>
               <div className="uj-grid">
-                {FIELDS.map(({ name, label, icon: Icon, placeholder, type }) => (
-                  <div key={name}>
-                    <div className="uj-label"><Icon size={13} /> {label}</div>
-                    <input className="uj-input" type={type} name={name} value={input[name]} onChange={changeEventHandler} placeholder={placeholder} />
-                  </div>
-                ))}
+                {FIELDS.map(({ name, label, icon, placeholder, type }) => {
+  const Icon = icon;
+  return (
+    <div key={name}>
+      <div className="uj-label"><Icon size={13} /> {label}</div>
+      <input className="uj-input" type={type} name={name}
+        value={input[name]} onChange={changeEventHandler}
+        placeholder={placeholder} />
+    </div>
+  );
+})}
 
                 {companies.length > 0 && (
                   <div className="uj-full">
